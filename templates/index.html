@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Daily Creative Spark — worksheet generator</title>
+  <style>
+    :root {
+      --navy: #1e40af; --blue: #2563eb; --blue-light: #eff6ff;
+      --ink: #1f2937; --gray: #6b7280; --border: #d1d5db; --bg: #f8fafc;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; padding: 0 16px 60px;
+      font-family: -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
+      color: var(--ink); background: var(--bg);
+    }
+    .wrap { max-width: 820px; margin: 0 auto; }
+    h1 {
+      color: var(--navy); font-size: 26px; margin: 28px 0 4px;
+    }
+    p.tag { color: var(--gray); margin: 0 0 24px; }
+    .card {
+      background: #fff; border: 1px solid var(--border); border-radius: 8px;
+      padding: 20px 22px; margin-bottom: 22px;
+    }
+    label { display: block; font-weight: 600; margin-bottom: 6px; font-size: 14px; }
+    textarea {
+      width: 100%; min-height: 260px; font-family: ui-monospace, Menlo, Consolas, monospace;
+      font-size: 13.5px; padding: 12px; border: 1px solid var(--border);
+      border-radius: 6px; resize: vertical; line-height: 1.5;
+    }
+    details { margin-top: 14px; }
+    summary {
+      cursor: pointer; font-weight: 600; font-size: 14px; color: var(--blue);
+      padding: 4px 0;
+    }
+    .settings-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 12px 16px; margin-top: 12px;
+    }
+    .settings-grid > div { grid-column: span 1; }
+    .settings-grid input {
+      width: 100%; padding: 8px 10px; border: 1px solid var(--border);
+      border-radius: 6px; font-size: 13.5px;
+    }
+    .settings-grid label { font-weight: 500; font-size: 12.5px; color: var(--gray); }
+    button {
+      background: var(--navy); color: #fff; border: none; border-radius: 6px;
+      padding: 11px 22px; font-size: 15px; font-weight: 600; cursor: pointer;
+      margin-top: 16px;
+    }
+    button:hover { background: var(--blue); }
+    .flash {
+      background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca;
+      border-radius: 6px; padding: 10px 14px; margin-bottom: 18px; font-size: 14px;
+    }
+    .example-link {
+      font-size: 13px; color: var(--blue); cursor: pointer; text-decoration: underline;
+      background: none; border: none; padding: 0; margin-left: 10px; font-weight: 500;
+    }
+    table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    th, td { text-align: left; padding: 8px 6px; border-bottom: 1px solid #eee; }
+    th { color: var(--gray); font-weight: 600; font-size: 12.5px; text-transform: uppercase; }
+    a.dl { color: var(--blue); text-decoration: none; font-weight: 500; }
+    a.dl:hover { text-decoration: underline; }
+    .empty { color: var(--gray); font-size: 14px; padding: 8px 0; }
+    footer { text-align: center; color: var(--gray); font-size: 12.5px; margin-top: 30px; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>Daily Creative Spark</h1>
+    <p class="tag">Paste a day's writing prompt below and get a print-ready worksheet PDF.</p>
+
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        {% for m in messages %}<div class="flash">{{ m }}</div>{% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <form class="card" action="{{ url_for('generate') }}" method="post" target="_blank">
+      <label for="prompt_text">
+        Day prompt
+        <button type="button" class="example-link" onclick="fillExample()">use example</button>
+      </label>
+      <textarea id="prompt_text" name="prompt_text" placeholder="Day 2 (Tuesday): Sensory Description
+
+* Focus Skill: ...
+* Topic: ...
+* Story / Prompt Starter: &quot;...&quot;
+* 3-Minute Chat Prompts (Ask Adeeba):
+   1. ...
+   2. ...
+   3. ...
+* Word Vault (Aim for 3): `word1`, `word2`, `word3`
+* Star Challenge (Optional): ..."></textarea>
+
+      <details>
+        <summary>Settings (optional overrides)</summary>
+        <div class="settings-grid">
+          <div>
+            <label for="student_name">Student name</label>
+            <input type="text" id="student_name" name="student_name" placeholder="{{ defaults.student_name }}">
+          </div>
+          <div>
+            <label for="class_label">Class label</label>
+            <input type="text" id="class_label" name="class_label" placeholder="{{ defaults.class_label }}">
+          </div>
+          <div>
+            <label for="goal">Goal</label>
+            <input type="text" id="goal" name="goal" placeholder="{{ defaults.goal }}">
+          </div>
+          <div>
+            <label for="footer_left">Footer (left)</label>
+            <input type="text" id="footer_left" name="footer_left" placeholder="{{ defaults.footer_left }}">
+          </div>
+          <div style="grid-column: span 2;">
+            <label for="footer_right">Footer (right)</label>
+            <input type="text" id="footer_right" name="footer_right" placeholder="{{ defaults.footer_right }}">
+          </div>
+        </div>
+      </details>
+
+      <button type="submit">Generate PDF</button>
+    </form>
+
+    <div class="card">
+      <label style="margin-bottom: 10px;">Recent worksheets</label>
+      {% if history %}
+        <table>
+          <tr><th>File</th><th>Created</th><th></th></tr>
+          {% for h in history %}
+          <tr>
+            <td>{{ h.name }}</td>
+            <td>{{ h.mtime }}</td>
+            <td><a class="dl" href="{{ url_for('download', name=h.name) }}">Download</a></td>
+          </tr>
+          {% endfor %}
+        </table>
+      {% else %}
+        <div class="empty">No worksheets generated yet.</div>
+      {% endif %}
+    </div>
+
+    <footer>
+      <a href="https://github.com/azimul-kabir/creative-writing" style="color: inherit;">azimul-kabir/creative-writing</a>
+    </footer>
+  </div>
+
+  <script>
+    const EXAMPLE = {{ example_prompt|tojson }};
+    function fillExample() {
+      document.getElementById('prompt_text').value = EXAMPLE;
+    }
+  </script>
+</body>
+</html>

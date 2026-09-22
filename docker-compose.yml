@@ -1,0 +1,20 @@
+services:
+  creative-writing:
+    build: .
+    image: creative-writing:latest
+    container_name: creative-writing
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+    volumes:
+      # generated worksheets persist here across container restarts/updates
+      - ./data:/data
+    environment:
+      # Change these to suit your child/class — every field is also
+      # overridable per-request from the "Settings" panel in the web form.
+      STUDENT_NAME: "Adeeba"
+      CLASS_LABEL: "Class II • Cambridge"
+      DEFAULT_GOAL: "5–8 complete sentences"
+      FOOTER_LEFT: "Scholastica Primary English Support • Stage 3"
+      FOOTER_RIGHT: "A4 Daily Writing Challenge Worksheet"
+      # SECRET_KEY: "change-me"   # optional, only used for flash messages
