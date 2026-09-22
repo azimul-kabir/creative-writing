@@ -88,7 +88,7 @@ DEFAULTS = {
         "Finger spaces between words",
         "Used 3 Vault words",
     ],
-    "story_lines": 15,
+    "story_lines": 12,
     "footer_left": os.environ.get(
         "FOOTER_LEFT", "Scholastica Primary English Support \u2022 Stage 3"
     ),
@@ -130,16 +130,16 @@ def draw_header(c, cfg, top_y):
     c.setLineWidth(1)
     c.line(MARGIN, top_y, PAGE_W - MARGIN, top_y)
 
-    baseline = top_y - 27
+    baseline = top_y - 23
 
     title_text = "Daily Creative Spark"
-    title_size = 19
+    title_size = 16.5
     c.setFont("Helvetica-Bold", title_size)
     c.setFillColor(NAVY)
     c.drawString(MARGIN, baseline, title_text)
     title_w = stringWidth(title_text, "Helvetica-Bold", title_size)
 
-    field_size = 9.3
+    field_size = 8.5
     c.setFont("Helvetica", field_size)
     c.setFillColor(INK)
     right_edge = PAGE_W - MARGIN
@@ -163,13 +163,13 @@ def draw_header(c, cfg, top_y):
             c.drawString(vx, y, "." * int(dotted_width / 3.0))
         return x_start
 
-    day_x = right_field("Day:", "", right_edge, dotted_width=38)
-    date_x = right_field("Date:", "", day_x - 16, dotted_width=55)
+    day_x = right_field("Day:", "", right_edge - 8, dotted_width=38)
+    date_x = right_field("Date:", "", day_x - 20, dotted_width=55)
     writer_x = right_field("Writer:", cfg.get("student_name", ""), date_x - 16, bold_value=True)
 
     badge_text = cfg.get("class_label", "") or cfg.get("day_label", "")
-    badge_font_size = 9.3
-    badge_pad_x = 8
+    badge_font_size = 8.5
+    badge_pad_x = 7
     badge_x = MARGIN + title_w + 12
     available = max(writer_x - 12 - badge_x, 40)
     badge_w = stringWidth(badge_text, "Helvetica-Bold", badge_font_size) + 2 * badge_pad_x
@@ -177,15 +177,15 @@ def draw_header(c, cfg, top_y):
         badge_font_size -= 0.4
         badge_w = stringWidth(badge_text, "Helvetica-Bold", badge_font_size) + 2 * badge_pad_x
     badge_w = min(badge_w, available)
-    badge_h = 18
-    badge_y = baseline - 3
+    badge_h = 16
+    badge_y = baseline - 2.5
     rounded_rect(c, badge_x, badge_y, badge_w, badge_h, badge_h / 2,
                  fill=BLUE_LIGHT_BG, stroke=BLUE_BORDER, line_width=1)
     c.setFont("Helvetica-Bold", badge_font_size)
     c.setFillColor(BLUE)
-    c.drawString(badge_x + badge_pad_x, badge_y + 5.5, badge_text)
+    c.drawString(badge_x + badge_pad_x, badge_y + 4.8, badge_text)
 
-    rule_y = top_y - 40
+    rule_y = top_y - 33
     c.setStrokeColor(NAVY)
     c.setLineWidth(2.2)
     c.line(MARGIN, rule_y, PAGE_W - MARGIN, rule_y)
@@ -193,7 +193,7 @@ def draw_header(c, cfg, top_y):
 
 
 def draw_quest_box(c, cfg, top_y):
-    box_h = 68 if cfg.get("focus_skill") else 56
+    box_h = 58 if cfg.get("focus_skill") else 47
     x, w = MARGIN, PAGE_W - 2 * MARGIN
     y = top_y - box_h
 
@@ -202,8 +202,8 @@ def draw_quest_box(c, cfg, top_y):
     c.rect(x, y, 4, box_h, stroke=0, fill=1)
 
     pad = 16
-    ty = top_y - 13
-    c.setFont("Helvetica-Bold", 9.5)
+    ty = top_y - 11
+    c.setFont("Helvetica-Bold", 8.5)
     c.setFillColor(BLUE)
     c.drawString(x + pad, ty, "TODAY'S WRITING QUEST")
 
@@ -213,17 +213,17 @@ def draw_quest_box(c, cfg, top_y):
     if category:
         goal_text = f"{goal_text}  \u2022  {category}" if goal_text else category
     if goal_text:
-        c.setFont("Helvetica-Bold", 9.5)
+        c.setFont("Helvetica-Bold", 8.5)
         c.setFillColor(INK)
         c.drawRightString(x + w - pad, ty, goal_text)
 
-    ty -= 18
-    c.setFont("Helvetica-Bold", 14)
+    ty -= 16
+    c.setFont("Helvetica-Bold", 12.5)
     c.setFillColor(INK)
     c.drawString(x + pad, ty, cfg.get("topic_title", ""))
 
-    ty -= 16
-    c.setFont("Helvetica-Oblique", 10.5)
+    ty -= 14
+    c.setFont("Helvetica-Oblique", 9.5)
     c.setFillColor(HexColor("#374151"))
     quote = cfg.get("prompt_starter", "")
     if quote and not quote.startswith("\u201c"):
@@ -232,8 +232,8 @@ def draw_quest_box(c, cfg, top_y):
 
     focus = cfg.get("focus_skill")
     if focus:
-        ty -= 14
-        c.setFont("Helvetica-Oblique", 9)
+        ty -= 12
+        c.setFont("Helvetica-Oblique", 8.3)
         c.setFillColor(GRAY)
         c.drawString(x + pad, ty, f"Focus skill: {focus}")
 
@@ -250,20 +250,20 @@ def draw_two_column(c, cfg, top_y):
     vault_words = cfg.get("word_vault", [])
     challenge = cfg.get("challenge", "")
 
-    chat_line_h = 15
+    chat_line_h = 13
     chat_pad = 16
     extra_wrap_lines = 0
     for label, question in chat_qs:
         prefix = f"{label}  " if label else "•  "
-        pw = stringWidth(prefix, "Helvetica-Bold", 9.7)
+        pw = stringWidth(prefix, "Helvetica-Bold", 9.0)
         avail = col_w - 2 * chat_pad - pw
-        qlines = wrap_text(question, "Helvetica", 9.7, avail) or [""]
+        qlines = wrap_text(question, "Helvetica", 9.0, avail) or [""]
         extra_wrap_lines += len(qlines) - 1
-    chat_body_h = 26 + len(chat_qs) * chat_line_h + extra_wrap_lines * 13
+    chat_body_h = 22 + len(chat_qs) * chat_line_h + extra_wrap_lines * 11
 
-    chip_pad_x, chip_gap, chip_h = 10, 8, 22
+    chip_pad_x, chip_gap, chip_h = 9, 7, 20
     chip_font = "Helvetica-Bold"
-    chip_size = 9.5
+    chip_size = 8.7
     lines, cur_line, cur_w = [], [], 0
     max_chip_w = col_w - 32
     for word in vault_words:
@@ -276,13 +276,13 @@ def draw_two_column(c, cfg, top_y):
     if cur_line:
         lines.append(cur_line)
     vault_chip_rows = len(lines)
-    vault_body_h = 30 + vault_chip_rows * (chip_h + 6)
+    vault_body_h = 26 + vault_chip_rows * (chip_h + 5)
     challenge_lines = []
     if challenge:
-        challenge_lines = wrap_text(f"Challenge: {challenge}", "Helvetica-Oblique", 9, col_w - 32)
-        vault_body_h += 6 + len(challenge_lines) * 12
+        challenge_lines = wrap_text(f"Challenge: {challenge}", "Helvetica-Oblique", 8.3, col_w - 32)
+        vault_body_h += 5 + len(challenge_lines) * 11
 
-    box_h = max(chat_body_h, vault_body_h, 70)
+    box_h = max(chat_body_h, vault_body_h, 60)
     y = top_y - box_h
 
     # ----- Chat & Think box -----
@@ -290,26 +290,26 @@ def draw_two_column(c, cfg, top_y):
     c.setFillColor(GREEN)
     c.rect(left_x, y, 4, box_h, stroke=0, fill=1)
     pad = 16
-    ty = top_y - 20
-    c.setFont("Helvetica-Bold", 10.5)
+    ty = top_y - 17
+    c.setFont("Helvetica-Bold", 9.5)
     c.setFillColor(INK)
     c.drawString(left_x + pad, ty, "3-MINUTE CHAT & THINK")
-    ty -= 20
-    c.setFont("Helvetica", 9.7)
+    ty -= 17
+    c.setFont("Helvetica", 9.0)
     for label, question in chat_qs:
         c.setFillColor(INK)
-        c.setFont("Helvetica-Bold", 9.7)
+        c.setFont("Helvetica-Bold", 9.0)
         prefix = f"{label}  " if label else "\u2022  "
         c.drawString(left_x + pad, ty, prefix)
-        pw = stringWidth(prefix, "Helvetica-Bold", 9.7)
-        c.setFont("Helvetica", 9.7)
+        pw = stringWidth(prefix, "Helvetica-Bold", 9.0)
+        c.setFont("Helvetica", 9.0)
         avail = col_w - 2 * pad - pw
-        qlines = wrap_text(question, "Helvetica", 9.7, avail)
+        qlines = wrap_text(question, "Helvetica", 9.0, avail)
         if not qlines:
             qlines = [""]
         c.drawString(left_x + pad + pw, ty, qlines[0])
         for extra in qlines[1:]:
-            ty -= 13
+            ty -= 11
             c.drawString(left_x + pad + pw, ty, extra)
         ty -= chat_line_h
 
@@ -317,14 +317,14 @@ def draw_two_column(c, cfg, top_y):
     rounded_rect(c, right_x, y, col_w, box_h, 4, stroke=BOX_BORDER, line_width=1)
     c.setFillColor(AMBER)
     c.rect(right_x, y, 4, box_h, stroke=0, fill=1)
-    ty = top_y - 20
+    ty = top_y - 17
     label = "WRITER'S WORD VAULT"
     instr = cfg.get("vault_instruction") or "Use at least 3!"
-    c.setFont("Helvetica-Bold", 10.5)
+    c.setFont("Helvetica-Bold", 9.5)
     c.setFillColor(INK)
     c.drawString(right_x + pad, ty, f"{label} ({instr.upper()})")
 
-    ty -= 22
+    ty -= 19
     for row in lines:
         rh_y = ty - chip_h + 5
         cx = right_x + pad
@@ -332,43 +332,43 @@ def draw_two_column(c, cfg, top_y):
             rounded_rect(c, cx, rh_y, ww, chip_h, chip_h / 2, fill=CHIP_BG)
             c.setFont(chip_font, chip_size)
             c.setFillColor(CHIP_TEXT)
-            c.drawCentredString(cx + ww / 2, rh_y + 6.5, word)
+            c.drawCentredString(cx + ww / 2, rh_y + 6, word)
             cx += ww + chip_gap
-        ty -= (chip_h + 6)
+        ty -= (chip_h + 5)
 
     if challenge_lines:
-        ty -= 4
-        c.setFont("Helvetica-Oblique", 9)
+        ty -= 3
+        c.setFont("Helvetica-Oblique", 8.3)
         c.setFillColor(GRAY)
         for cl in challenge_lines:
             c.drawString(right_x + pad, ty, cl)
-            ty -= 12
+            ty -= 11
 
     return y
 
 
 def draw_story_area(c, cfg, top_y, bottom_limit):
     x, w = MARGIN, PAGE_W - 2 * MARGIN
-    header_h = 22
+    header_h = 19
     box_h = top_y - bottom_limit
     y = bottom_limit
 
     rounded_rect(c, x, y, w, box_h, 4, stroke=BOX_BORDER, line_width=1)
 
     pad = 16
-    ty = top_y - 15
-    c.setFont("Helvetica-Bold", 11)
+    ty = top_y - 13
+    c.setFont("Helvetica-Bold", 10)
     c.setFillColor(INK)
     name = cfg.get("student_name", "Writer")
     c.drawString(x + pad, ty, f"{name}'s Story Area")
 
-    c.setFont("Helvetica-Oblique", 8.5)
+    c.setFont("Helvetica-Oblique", 8)
     c.setFillColor(GRAY)
     c.drawRightString(x + w - pad, ty, "Dotted line = guide for lowercase letters")
 
-    n_lines = cfg.get("story_lines", 15)
-    top_pad = 11
-    bottom_pad = 10
+    n_lines = cfg.get("story_lines", 12)
+    top_pad = 10
+    bottom_pad = 9
     usable_h = box_h - header_h - top_pad - bottom_pad
     step = usable_h / n_lines
     line_y = top_y - header_h - top_pad
@@ -378,19 +378,20 @@ def draw_story_area(c, cfg, top_y, bottom_limit):
         c.setStrokeColor(LINE_GRAY)
         c.setLineWidth(0.8)
         c.line(x + pad, base_y, x + w - pad, base_y)
-        dotted_y = base_y + step * 0.42
-        c.setStrokeColor(DOT_GRAY)
-        c.setDash(1, 2)
-        c.setLineWidth(0.8)
-        c.line(x + pad, dotted_y, x + w - pad, dotted_y)
-        c.setDash()
+        if i > 0:
+            dotted_y = base_y + step * 0.42
+            c.setStrokeColor(DOT_GRAY)
+            c.setDash(1, 2)
+            c.setLineWidth(0.8)
+            c.line(x + pad, dotted_y, x + w - pad, dotted_y)
+            c.setDash()
 
     return y
 
 
 def draw_footer_panel(c, cfg, top_y):
     x, w = MARGIN, PAGE_W - 2 * MARGIN
-    box_h = 58
+    box_h = 50
     y = top_y - box_h
     rounded_rect(c, x, y, w, box_h, 4, stroke=BOX_BORDER, line_width=1)
 
@@ -398,20 +399,20 @@ def draw_footer_panel(c, cfg, top_y):
     split = x + w * 0.66
     c.setStrokeColor(BOX_BORDER)
     c.setLineWidth(1)
-    c.line(split, y + 8, split, y + box_h - 8)
+    c.line(split, y + 7, split, y + box_h - 7)
 
-    ty = top_y - 15
+    ty = top_y - 13
     name = cfg.get("student_name", "Writer")
-    c.setFont("Helvetica-Bold", 9.5)
+    c.setFont("Helvetica-Bold", 8.7)
     c.setFillColor(INK)
     c.drawString(x + pad, ty, f"{name.upper()}'S DETECTIVE CHECKLIST")
 
     items = cfg.get("checklist_items") or DEFAULTS["checklist_items"]
     col1 = items[0::2]
     col2 = items[1::2]
-    box_sz = 9
-    row_h = 14
-    cy = ty - 16
+    box_sz = 8.5
+    row_h = 13
+    cy = ty - 14
 
     left_region_w = split - x
     col_gap = 10
@@ -424,14 +425,14 @@ def draw_footer_panel(c, cfg, top_y):
         for it in items_col:
             c.setStrokeColor(GRAY)
             c.setLineWidth(1)
-            c.rect(cx, yy - box_sz + 2, box_sz, box_sz, stroke=1, fill=0)
-            c.setFont("Helvetica", 8.6)
+            c.rect(cx, yy - 1.5, box_sz, box_sz, stroke=1, fill=0)
+            c.setFont("Helvetica", 8)
             c.setFillColor(INK)
             text_w = col_w - box_sz - 6
-            it_lines = wrap_text(it, "Helvetica", 8.6, text_w) or [it]
+            it_lines = wrap_text(it, "Helvetica", 8, text_w) or [it]
             c.drawString(cx + box_sz + 6, yy, it_lines[0])
             for extra in it_lines[1:]:
-                yy -= 10
+                yy -= 9
                 c.drawString(cx + box_sz + 6, yy, extra)
             yy -= row_h
 
@@ -439,17 +440,17 @@ def draw_footer_panel(c, cfg, top_y):
     draw_checks(col2, col2_x)
 
     rx = split + 16
-    c.setFont("Helvetica-Bold", 10)
+    c.setFont("Helvetica-Bold", 9.3)
     c.setFillColor(INK)
     c.drawString(rx, ty, "Today's Effort:")
-    star_x = rx + stringWidth("Today's Effort: ", "Helvetica-Bold", 10)
-    c.setFont("Helvetica", 13)
+    star_x = rx + stringWidth("Today's Effort: ", "Helvetica-Bold", 9.3)
+    c.setFont("Helvetica", 12)
     c.setFillColor(HexColor("#F59E0B"))
     c.drawString(star_x, ty - 1, "\u2605 \u2605 \u2605 \u2605 \u2605")
 
-    c.setFont("Helvetica", 9)
+    c.setFont("Helvetica", 8.3)
     c.setFillColor(GRAY)
-    c.drawString(rx, ty - 22, "Favorite word " + name + " used: " + "." * 16)
+    c.drawString(rx, ty - 19, "Favorite word " + name + " used: " + "." * 16)
 
     return y
 
@@ -462,23 +463,23 @@ def draw_page_footer(c, cfg, bottom_y):
     c.setLineWidth(0.8)
     c.line(x, bottom_y, x + w, bottom_y)
     c.setDash()
-    c.setFont("Helvetica", 8.5)
+    c.setFont("Helvetica", 8)
     c.setFillColor(GRAY)
-    c.drawString(x, bottom_y - 14, cfg.get("footer_left", ""))
-    c.drawRightString(x + w, bottom_y - 14, cfg.get("footer_right", ""))
+    c.drawString(x, bottom_y - 12, cfg.get("footer_left", ""))
+    c.drawRightString(x + w, bottom_y - 12, cfg.get("footer_right", ""))
 
 
 def _render(c, cfg):
     c.setTitle(f"Daily Creative Spark - {cfg.get('day_label', '')}".strip())
     top_y = PAGE_H - MARGIN
     rule_y = draw_header(c, cfg, top_y)
-    y = draw_quest_box(c, cfg, rule_y - 11)
-    y = draw_two_column(c, cfg, y - 11)
-    footer_reserved = 58 + 11 + 22
+    y = draw_quest_box(c, cfg, rule_y - 9)
+    y = draw_two_column(c, cfg, y - 9)
+    footer_reserved = 50 + 9 + 19
     story_bottom = footer_reserved + MARGIN
-    y = draw_story_area(c, cfg, y - 11, story_bottom)
-    y2 = draw_footer_panel(c, cfg, y - 6)
-    draw_page_footer(c, cfg, y2 - 9)
+    y = draw_story_area(c, cfg, y - 9, story_bottom)
+    y2 = draw_footer_panel(c, cfg, y - 5)
+    draw_page_footer(c, cfg, y2 - 8)
     c.showPage()
     c.save()
 
