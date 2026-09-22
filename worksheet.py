@@ -130,7 +130,7 @@ def draw_header(c, cfg, top_y):
     c.setLineWidth(1)
     c.line(MARGIN, top_y, PAGE_W - MARGIN, top_y)
 
-    baseline = top_y - 32
+    baseline = top_y - 27
 
     title_text = "Daily Creative Spark"
     title_size = 19
@@ -185,7 +185,7 @@ def draw_header(c, cfg, top_y):
     c.setFillColor(BLUE)
     c.drawString(badge_x + badge_pad_x, badge_y + 5.5, badge_text)
 
-    rule_y = top_y - 48
+    rule_y = top_y - 40
     c.setStrokeColor(NAVY)
     c.setLineWidth(2.2)
     c.line(MARGIN, rule_y, PAGE_W - MARGIN, rule_y)
@@ -193,7 +193,7 @@ def draw_header(c, cfg, top_y):
 
 
 def draw_quest_box(c, cfg, top_y):
-    box_h = 78 if cfg.get("focus_skill") else 66
+    box_h = 68 if cfg.get("focus_skill") else 56
     x, w = MARGIN, PAGE_W - 2 * MARGIN
     y = top_y - box_h
 
@@ -202,7 +202,7 @@ def draw_quest_box(c, cfg, top_y):
     c.rect(x, y, 4, box_h, stroke=0, fill=1)
 
     pad = 16
-    ty = top_y - 16
+    ty = top_y - 13
     c.setFont("Helvetica-Bold", 9.5)
     c.setFillColor(BLUE)
     c.drawString(x + pad, ty, "TODAY'S WRITING QUEST")
@@ -217,12 +217,12 @@ def draw_quest_box(c, cfg, top_y):
         c.setFillColor(INK)
         c.drawRightString(x + w - pad, ty, goal_text)
 
-    ty -= 20
+    ty -= 18
     c.setFont("Helvetica-Bold", 14)
     c.setFillColor(INK)
     c.drawString(x + pad, ty, cfg.get("topic_title", ""))
 
-    ty -= 18
+    ty -= 16
     c.setFont("Helvetica-Oblique", 10.5)
     c.setFillColor(HexColor("#374151"))
     quote = cfg.get("prompt_starter", "")
@@ -232,7 +232,7 @@ def draw_quest_box(c, cfg, top_y):
 
     focus = cfg.get("focus_skill")
     if focus:
-        ty -= 16
+        ty -= 14
         c.setFont("Helvetica-Oblique", 9)
         c.setFillColor(GRAY)
         c.drawString(x + pad, ty, f"Focus skill: {focus}")
@@ -341,14 +341,14 @@ def draw_two_column(c, cfg, top_y):
 
 def draw_story_area(c, cfg, top_y, bottom_limit):
     x, w = MARGIN, PAGE_W - 2 * MARGIN
-    header_h = 26
+    header_h = 22
     box_h = top_y - bottom_limit
     y = bottom_limit
 
     rounded_rect(c, x, y, w, box_h, 4, stroke=BOX_BORDER, line_width=1)
 
     pad = 16
-    ty = top_y - 18
+    ty = top_y - 15
     c.setFont("Helvetica-Bold", 11)
     c.setFillColor(INK)
     name = cfg.get("student_name", "Writer")
@@ -359,8 +359,8 @@ def draw_story_area(c, cfg, top_y, bottom_limit):
     c.drawRightString(x + w - pad, ty, "Dotted line = guide for lowercase letters")
 
     n_lines = cfg.get("story_lines", 15)
-    top_pad = 14
-    bottom_pad = 12
+    top_pad = 11
+    bottom_pad = 10
     usable_h = box_h - header_h - top_pad - bottom_pad
     step = usable_h / n_lines
     line_y = top_y - header_h - top_pad
@@ -382,7 +382,7 @@ def draw_story_area(c, cfg, top_y, bottom_limit):
 
 def draw_footer_panel(c, cfg, top_y):
     x, w = MARGIN, PAGE_W - 2 * MARGIN
-    box_h = 66
+    box_h = 58
     y = top_y - box_h
     rounded_rect(c, x, y, w, box_h, 4, stroke=BOX_BORDER, line_width=1)
 
@@ -392,7 +392,7 @@ def draw_footer_panel(c, cfg, top_y):
     c.setLineWidth(1)
     c.line(split, y + 8, split, y + box_h - 8)
 
-    ty = top_y - 18
+    ty = top_y - 15
     name = cfg.get("student_name", "Writer")
     c.setFont("Helvetica-Bold", 9.5)
     c.setFillColor(INK)
@@ -402,8 +402,8 @@ def draw_footer_panel(c, cfg, top_y):
     col1 = items[0::2]
     col2 = items[1::2]
     box_sz = 9
-    row_h = 16
-    cy = ty - 18
+    row_h = 14
+    cy = ty - 16
 
     left_region_w = split - x
     col_gap = 10
@@ -441,7 +441,7 @@ def draw_footer_panel(c, cfg, top_y):
 
     c.setFont("Helvetica", 9)
     c.setFillColor(GRAY)
-    c.drawString(rx, ty - 26, "Favorite word " + name + " used: " + "." * 16)
+    c.drawString(rx, ty - 22, "Favorite word " + name + " used: " + "." * 16)
 
     return y
 
@@ -464,13 +464,13 @@ def _render(c, cfg):
     c.setTitle(f"Daily Creative Spark - {cfg.get('day_label', '')}".strip())
     top_y = PAGE_H - MARGIN
     rule_y = draw_header(c, cfg, top_y)
-    y = draw_quest_box(c, cfg, rule_y - 14)
-    y = draw_two_column(c, cfg, y - 14)
-    footer_reserved = 66 + 14 + 26
+    y = draw_quest_box(c, cfg, rule_y - 11)
+    y = draw_two_column(c, cfg, y - 11)
+    footer_reserved = 58 + 11 + 22
     story_bottom = footer_reserved + MARGIN
-    y = draw_story_area(c, cfg, y - 14, story_bottom)
-    y2 = draw_footer_panel(c, cfg, y - 8)
-    draw_page_footer(c, cfg, y2 - 10)
+    y = draw_story_area(c, cfg, y - 11, story_bottom)
+    y2 = draw_footer_panel(c, cfg, y - 6)
+    draw_page_footer(c, cfg, y2 - 9)
     c.showPage()
     c.save()
 
