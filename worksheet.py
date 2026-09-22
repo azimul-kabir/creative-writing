@@ -251,7 +251,15 @@ def draw_two_column(c, cfg, top_y):
     challenge = cfg.get("challenge", "")
 
     chat_line_h = 15
-    chat_body_h = 26 + len(chat_qs) * chat_line_h
+    chat_pad = 16
+    extra_wrap_lines = 0
+    for label, question in chat_qs:
+        prefix = f"{label}  " if label else "•  "
+        pw = stringWidth(prefix, "Helvetica-Bold", 9.7)
+        avail = col_w - 2 * chat_pad - pw
+        qlines = wrap_text(question, "Helvetica", 9.7, avail) or [""]
+        extra_wrap_lines += len(qlines) - 1
+    chat_body_h = 26 + len(chat_qs) * chat_line_h + extra_wrap_lines * 13
 
     chip_pad_x, chip_gap, chip_h = 10, 8, 22
     chip_font = "Helvetica-Bold"
