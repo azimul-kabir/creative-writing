@@ -441,7 +441,7 @@ def draw_footer_panel(c, cfg, top_y):
 
     c.setFont("Helvetica", 9)
     c.setFillColor(GRAY)
-    c.drawString(rx, ty - 26, "Favorite word " + name + " used: " + "." * 24)
+    c.drawString(rx, ty - 26, "Favorite word " + name + " used: " + "." * 16)
 
     return y
 
