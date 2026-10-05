@@ -24,6 +24,7 @@ The requests never include the child's name or school: the name is only
 added locally, when the text is formatted.
 """
 
+import concurrent.futures
 import json
 import logging
 import os
@@ -212,6 +213,14 @@ def chat_prompt_text(weekday, student_name="Adeeba", theme="", recent_topics=())
     return f"{SYSTEM_PROMPT}\n\n{user}{CHAT_FORMAT.format(example=example)}"
 
 
+PER_MODEL_TIMEOUT = max(15.0, REQUEST_TIMEOUT / max(len(GEMINI_MODELS), 1))
+
+# Gemini calls run here so we can stop waiting at a hard wall-clock limit:
+# the SDK's own `timeout` applies per network wait, not to the whole call,
+# and was seen running ~2x over. An abandoned call finishes in the
+# background and is ignored.
+_gemini_pool = concurrent.futures.ThreadPoolExecutor(max_workers=4, thread_name_prefix="gemini")
+
 # statuses where another model may well succeed: overloaded / server error,
 # per-model quota used up, model retired
 _GEMINI_TRY_NEXT = {404, 429, 500, 503}
@@ -221,11 +230,15 @@ def _ask_gemini(user):
     from google import genai
     from google.genai import types
 
-    # One attempt per model: the SDK otherwise retries timeouts up to 3
-    # times, which can stretch a slow request to minutes.
+    # One request per model, no SDK retries: we move on to the next model
+    # ourselves. The SDK treats `attempts` as a retry count with a minimum
+    # of 1, so it can't switch retries off; instead, limit the statuses it
+    # retries to one Google never sends.
     client = genai.Client(
         api_key=os.environ["GEMINI_API_KEY"],
-        http_options=types.HttpOptions(retry_options=types.HttpRetryOptions(attempts=1)),
+        http_options=types.HttpOptions(
+            retry_options=types.HttpRetryOptions(attempts=1, http_status_codes=[599]),
+        ),
     )
     # REQUEST_TIMEOUT is the budget for all models together, so the page
     # still gets an answer before a reverse proxy gives up.
@@ -237,8 +250,10 @@ def _ask_gemini(user):
         if remaining < 5:
             break
         started = time.monotonic()
+        limit = min(remaining, PER_MODEL_TIMEOUT)
         try:
-            interaction = client.interactions.create(
+            future = _gemini_pool.submit(
+                client.interactions.create,
                 model=model,
                 system_instruction=SYSTEM_PROMPT,
                 input=user,
@@ -250,9 +265,17 @@ def _ask_gemini(user):
                 # a short creative task: light thinking keeps replies to seconds
                 generation_config={"thinking_level": "low"},
                 store=False,
-                # leave time for the next model if this one hangs
-                timeout=min(remaining, 25),
+                timeout=limit,
             )
+            # Google can take ~30 s just to say a model is busy, so each
+            # model gets a share and the others still get their turn
+            interaction = future.result(timeout=limit + 1)
+        except concurrent.futures.TimeoutError:
+            future.cancel()
+            log.warning("Gemini %s gave no answer within %.0fs - trying the next model",
+                        model, limit)
+            last_error = f"{model} didn't answer in time"
+            continue
         except Exception as exc:
             # The SDK's error classes aren't exported publicly, so sort by
             # the HTTP status they carry; anything that isn't an API error
