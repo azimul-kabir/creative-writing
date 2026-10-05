@@ -27,22 +27,31 @@ student_name      : str
 class_label       : str   e.g. "Class II - Cambridge"
 day_label         : str   e.g. "Day 2 (Tuesday)" — used for the filename
 category          : str   optional, e.g. "Sensory Description"
-goal              : str   e.g. "5-8 complete sentences"
+goal              : str   e.g. "10-15 sentences in 3 paragraphs"
 focus_skill       : str   optional
 topic_title       : str
 prompt_starter    : str   the quoted opening line
 chat_questions    : list of [label, question]
-word_vault        : list of str
+word_vault        : list of str, or [word, meaning] pairs — a meaning is
+                    printed in small text under the word's chip
 vault_instruction : str   e.g. "Use at least 3!" / "Aim for 3"
 challenge         : str   optional
 checklist_items   : list of str
-story_lines       : int   default 15
+plan_labels       : list of str or [label, hint] — the "Plan it" boxes,
+                    default Beginning / Middle / End; [] hides the strip
+story_lines       : int   page-1 writing rows; default fills the space
+line_spacing_mm   : float gap between ruled lines, default 9
+guide_lines       : bool  dotted mid-line for letter sizing, default off
+pages             : int   2 (default) adds a full lined writing page with
+                    an "Edit & improve" box; 1 = single sheet
 footer_left       : str
 footer_right      : str
 """
 
 import io
 import json
+import math
+import os
 import re
 import sys
 from reportlab.lib.pagesizes import A4
@@ -59,6 +68,9 @@ BLUE_LIGHT_BG = HexColor("#EFF6FF")
 BLUE_BORDER = HexColor("#93C5FD")
 GREEN = HexColor("#16A34A")
 AMBER = HexColor("#D97706")
+PURPLE = HexColor("#7C3AED")
+PURPLE_BG = HexColor("#F5F3FF")
+STAR_GOLD = HexColor("#F59E0B")
 CHIP_BG = HexColor("#DBEAFE")
 CHIP_TEXT = HexColor("#1D4ED8")
 INK = HexColor("#1F2937")
@@ -70,25 +82,35 @@ PAGE_BORDER = HexColor("#E5E7EB")
 
 PAGE_W, PAGE_H = A4
 MARGIN = 40
+MM = 72 / 25.4
 
 # ----------------------------------------------------------------------
 # Site-wide defaults — override per-request from the web form, or edit
 # these (or set the matching environment variables in docker-compose.yml).
 # ----------------------------------------------------------------------
-import os
-
 DEFAULTS = {
     "student_name": os.environ.get("STUDENT_NAME", "Adeeba"),
     "class_label": os.environ.get("CLASS_LABEL", "Class II \u2022 Cambridge"),
-    "goal": os.environ.get("DEFAULT_GOAL", "5\u20138 complete sentences"),
+    "goal": os.environ.get("DEFAULT_GOAL", "10\u201315 sentences in 3 paragraphs"),
     "vault_instruction": "Use at least 3!",
+    # Cambridge Stage 3/4 writing habits (age 8-9)
     "checklist_items": [
-        "Capital letters at start",
-        "Full stops at the end",
-        "Finger spaces between words",
+        "Capital letters & full stops",
         "Used 3 Vault words",
+        "Joined ideas: and, but, so, because",
+        "New paragraph: start, middle, end",
+        "Speech marks when people talk",
+        "Read it back & fixed mistakes",
     ],
-    "story_lines": 12,
+    "plan_labels": [
+        ["Beginning", "Who? Where? When?"],
+        ["Middle", "What goes wrong?"],
+        ["End", "How is it fixed? Feelings?"],
+    ],
+    "story_lines": None,       # page-1 writing rows; None = fill the space
+    "line_spacing_mm": 9,      # ruled-line gap; ~9 mm suits age 8-9
+    "guide_lines": False,      # dotted mid-line for letter sizing (younger writers)
+    "pages": int(os.environ.get("PAGES", "2")),  # 2 = add a full writing page
     "footer_left": os.environ.get(
         "FOOTER_LEFT", "Scholastica Primary English Support \u2022 Stage 3"
     ),
@@ -111,6 +133,28 @@ def wrap_text(text, font, size, max_width):
     if cur:
         lines.append(cur)
     return lines
+
+
+MEANING_FONT = "Helvetica"
+MEANING_SIZE = 6.8
+MEANING_LEAD = 8
+
+_VAULT_ENTRY_RE = re.compile(r"^(.*?)\s*(?:\((.*)\)|(?:=|:|\s[-–—])\s*(.+))\s*$")
+
+
+def split_vault_entry(entry):
+    """A Word Vault entry is a plain word, a [word, meaning] pair, or a
+    string like "drenched (very wet)" / "drenched = very wet".
+    Returns (word, meaning) with meaning "" when there isn't one."""
+    if isinstance(entry, (list, tuple)):
+        word = str(entry[0]) if entry else ""
+        meaning = str(entry[1]) if len(entry) > 1 else ""
+        return word.strip(), meaning.strip()
+    text = str(entry).strip()
+    m = _VAULT_ENTRY_RE.match(text)
+    if m and m.group(1):
+        return m.group(1).strip(), (m.group(2) or m.group(3) or "").strip()
+    return text, ""
 
 
 def rounded_rect(c, x, y, w, h, r, fill=None, stroke=None, line_width=1):
@@ -193,15 +237,28 @@ def draw_header(c, cfg, top_y):
 
 
 def draw_quest_box(c, cfg, top_y):
-    box_h = 58 if cfg.get("focus_skill") else 47
     x, w = MARGIN, PAGE_W - 2 * MARGIN
+    pad = 16
+    text_w = w - 2 * pad
+
+    # Long topics / starters / focus skills wrap onto extra lines and the
+    # box grows to fit, instead of running off the page.
+    title_lines = wrap_text(cfg.get("topic_title", ""), "Helvetica-Bold", 12.5, text_w) or [""]
+    quote = cfg.get("prompt_starter", "")
+    if quote and not quote.startswith("“"):
+        quote = f"“{quote}”"
+    quote_lines = wrap_text(quote, "Helvetica-Oblique", 9.5, text_w) or [""]
+    focus = cfg.get("focus_skill")
+    focus_lines = wrap_text(f"Focus skill: {focus}", "Helvetica-Oblique", 8.3, text_w) if focus else []
+
+    box_h = (41 + 15 * (len(title_lines) - 1) + 12 * (len(quote_lines) - 1)
+             + 12 * len(focus_lines) + (5 if focus_lines else 6))
     y = top_y - box_h
 
     rounded_rect(c, x, y, w, box_h, 4, fill=BLUE_LIGHT_BG)
     c.setFillColor(BLUE)
     c.rect(x, y, 4, box_h, stroke=0, fill=1)
 
-    pad = 16
     ty = top_y - 11
     c.setFont("Helvetica-Bold", 8.5)
     c.setFillColor(BLUE)
@@ -220,22 +277,24 @@ def draw_quest_box(c, cfg, top_y):
     ty -= 16
     c.setFont("Helvetica-Bold", 12.5)
     c.setFillColor(INK)
-    c.drawString(x + pad, ty, cfg.get("topic_title", ""))
+    for i, line in enumerate(title_lines):
+        if i:
+            ty -= 15
+        c.drawString(x + pad, ty, line)
 
     ty -= 14
     c.setFont("Helvetica-Oblique", 9.5)
     c.setFillColor(HexColor("#374151"))
-    quote = cfg.get("prompt_starter", "")
-    if quote and not quote.startswith("\u201c"):
-        quote = f"\u201c{quote}\u201d"
-    c.drawString(x + pad, ty, quote)
+    for i, line in enumerate(quote_lines):
+        if i:
+            ty -= 12
+        c.drawString(x + pad, ty, line)
 
-    focus = cfg.get("focus_skill")
-    if focus:
+    c.setFont("Helvetica-Oblique", 8.3)
+    c.setFillColor(GRAY)
+    for line in focus_lines:
         ty -= 12
-        c.setFont("Helvetica-Oblique", 8.3)
-        c.setFillColor(GRAY)
-        c.drawString(x + pad, ty, f"Focus skill: {focus}")
+        c.drawString(x + pad, ty, line)
 
     return y
 
@@ -264,19 +323,38 @@ def draw_two_column(c, cfg, top_y):
     chip_pad_x, chip_gap, chip_h = 9, 7, 20
     chip_font = "Helvetica-Bold"
     chip_size = 8.7
-    lines, cur_line, cur_w = [], [], 0
     max_chip_w = col_w - 32
-    for word in vault_words:
-        ww = stringWidth(word, chip_font, chip_size) + 2 * chip_pad_x
-        if cur_w + ww + (chip_gap if cur_line else 0) > max_chip_w and cur_line:
+
+    # Each item is (word, chip_w, slot_w, meaning_lines): the slot is wide
+    # enough for the chip and for its meaning wrapped underneath.
+    items = []
+    for entry in vault_words:
+        word, meaning = split_vault_entry(entry)
+        chip_w = stringWidth(word, chip_font, chip_size) + 2 * chip_pad_x
+        slot_w = chip_w
+        m_lines = []
+        if meaning:
+            meaning_w = stringWidth(meaning, MEANING_FONT, MEANING_SIZE)
+            slot_w = min(max(chip_w, min(meaning_w, 96)), max_chip_w)
+            m_lines = wrap_text(meaning, MEANING_FONT, MEANING_SIZE, slot_w)
+        items.append((word, chip_w, slot_w, m_lines))
+
+    lines, cur_line, cur_w = [], [], 0
+    for item in items:
+        sw = item[2]
+        if cur_w + sw + (chip_gap if cur_line else 0) > max_chip_w and cur_line:
             lines.append(cur_line)
             cur_line, cur_w = [], 0
-        cur_line.append((word, ww))
-        cur_w += ww + (chip_gap if len(cur_line) > 1 else 0)
+        cur_line.append(item)
+        cur_w += sw + (chip_gap if len(cur_line) > 1 else 0)
     if cur_line:
         lines.append(cur_line)
-    vault_chip_rows = len(lines)
-    vault_body_h = 26 + vault_chip_rows * (chip_h + 5)
+
+    def row_h(row):
+        n_meaning = max(len(it[3]) for it in row)
+        return chip_h + 5 + (2 + n_meaning * MEANING_LEAD if n_meaning else 0)
+
+    vault_body_h = 26 + sum(row_h(row) for row in lines)
     challenge_lines = []
     if challenge:
         challenge_lines = wrap_text(f"Challenge: {challenge}", "Helvetica-Oblique", 8.3, col_w - 32)
@@ -328,13 +406,20 @@ def draw_two_column(c, cfg, top_y):
     for row in lines:
         rh_y = ty - chip_h + 5
         cx = right_x + pad
-        for word, ww in row:
-            rounded_rect(c, cx, rh_y, ww, chip_h, chip_h / 2, fill=CHIP_BG)
+        for word, chip_w, slot_w, m_lines in row:
+            chip_x = cx + (slot_w - chip_w) / 2
+            rounded_rect(c, chip_x, rh_y, chip_w, chip_h, chip_h / 2, fill=CHIP_BG)
             c.setFont(chip_font, chip_size)
             c.setFillColor(CHIP_TEXT)
-            c.drawCentredString(cx + ww / 2, rh_y + 6, word)
-            cx += ww + chip_gap
-        ty -= (chip_h + 5)
+            c.drawCentredString(cx + slot_w / 2, rh_y + 6, word)
+            my = rh_y - 2 - MEANING_SIZE
+            c.setFont(MEANING_FONT, MEANING_SIZE)
+            c.setFillColor(GRAY)
+            for ml in m_lines:
+                c.drawCentredString(cx + slot_w / 2, my, ml)
+                my -= MEANING_LEAD
+            cx += slot_w + chip_gap
+        ty -= row_h(row)
 
     if challenge_lines:
         ty -= 3
@@ -347,7 +432,71 @@ def draw_two_column(c, cfg, top_y):
     return y
 
 
-def draw_story_area(c, cfg, top_y, bottom_limit):
+def draw_plan_strip(c, cfg, top_y):
+    """A row of "Plan it" boxes (Beginning -> Middle -> End by default) for
+    a quick sketch or a few words before writing."""
+    labels = cfg.get("plan_labels") or []
+    x, w = MARGIN, PAGE_W - 2 * MARGIN
+    box_h = 66
+    y = top_y - box_h
+
+    rounded_rect(c, x, y, w, box_h, 4, stroke=BOX_BORDER, line_width=1)
+    c.setFillColor(PURPLE)
+    c.rect(x, y, 4, box_h, stroke=0, fill=1)
+
+    pad = 16
+    ty = top_y - 15
+    c.setFont("Helvetica-Bold", 9.5)
+    c.setFillColor(INK)
+    c.drawString(x + pad, ty, "PLAN IT FIRST")
+    c.setFont("Helvetica-Oblique", 8)
+    c.setFillColor(GRAY)
+    c.drawRightString(x + w - pad, ty, "Draw a little picture or write 2–3 words in each box")
+
+    arrow_gap = 18
+    n = len(labels)
+    inner_w = w - 2 * pad
+    cell_w = (inner_w - (n - 1) * arrow_gap) / n
+    cell_top = ty - 7
+    cell_bottom = y + 8
+    cell_h = cell_top - cell_bottom
+    cx = x + pad
+    for i, entry in enumerate(labels):
+        label, hint = (entry[0], entry[1] if len(entry) > 1 else "") \
+            if isinstance(entry, (list, tuple)) else (entry, "")
+        rounded_rect(c, cx, cell_bottom, cell_w, cell_h, 4, fill=PURPLE_BG)
+        c.setFont("Helvetica-Bold", 7.8)
+        c.setFillColor(PURPLE)
+        head = f"{i + 1}  {label}"
+        c.drawString(cx + 6, cell_top - 10, head)
+        if hint:
+            c.setFont("Helvetica-Oblique", 7)
+            c.setFillColor(GRAY)
+            c.drawString(cx + 6 + stringWidth(head + "  ", "Helvetica-Bold", 7.8),
+                         cell_top - 10, hint)
+        if i < n - 1:
+            ax = cx + cell_w + 4
+            ay = cell_bottom + cell_h / 2
+            c.setStrokeColor(PURPLE)
+            c.setLineWidth(1.2)
+            c.line(ax, ay, ax + arrow_gap - 10, ay)
+            p = c.beginPath()
+            p.moveTo(ax + arrow_gap - 8, ay)
+            p.lineTo(ax + arrow_gap - 12, ay + 3)
+            p.lineTo(ax + arrow_gap - 12, ay - 3)
+            p.close()
+            c.setFillColor(PURPLE)
+            c.drawPath(p, stroke=0, fill=1)
+        cx += cell_w + arrow_gap
+
+    return y
+
+
+def draw_story_area(c, cfg, top_y, bottom_limit, title, hint="", n_rows=None,
+                    corner_note=""):
+    """Lined writing box from top_y down to bottom_limit. n_rows=None fits
+    as many rows as line_spacing_mm allows; the last rule sits on the
+    bottom of the box."""
     x, w = MARGIN, PAGE_W - 2 * MARGIN
     header_h = 19
     box_h = top_y - bottom_limit
@@ -359,60 +508,108 @@ def draw_story_area(c, cfg, top_y, bottom_limit):
     ty = top_y - 13
     c.setFont("Helvetica-Bold", 10)
     c.setFillColor(INK)
-    name = cfg.get("student_name", "Writer")
-    c.drawString(x + pad, ty, f"{name}'s Story Area")
+    c.drawString(x + pad, ty, title)
 
-    c.setFont("Helvetica-Oblique", 8)
-    c.setFillColor(GRAY)
-    c.drawRightString(x + w - pad, ty, "Dotted line = guide for lowercase letters")
+    if hint:
+        c.setFont("Helvetica-Oblique", 8)
+        c.setFillColor(GRAY)
+        c.drawRightString(x + w - pad, ty, hint)
 
-    n_lines = cfg.get("story_lines", 12)
-    top_pad = 10
-    bottom_pad = 9
+    top_pad = 8
+    bottom_pad = 16 if corner_note else 12
     usable_h = box_h - header_h - top_pad - bottom_pad
-    step = usable_h / n_lines
+    if not n_rows:
+        n_rows = int(usable_h // (float(cfg.get("line_spacing_mm") or 9) * MM))
+    n_rows = max(int(n_rows), 1)
+    step = usable_h / n_rows
     line_y = top_y - header_h - top_pad
+    guides = cfg.get("guide_lines")
 
-    for i in range(n_lines):
+    # with no guides, the top rule is just the first line's ceiling, so
+    # it's drawn lighter
+    for i in range(n_rows + 1):
         base_y = line_y - i * step
-        c.setStrokeColor(LINE_GRAY)
+        c.setStrokeColor(LINE_GRAY if (i or guides) else BOX_BORDER)
         c.setLineWidth(0.8)
         c.line(x + pad, base_y, x + w - pad, base_y)
-        if i > 0:
+        if i > 0 and guides:
             dotted_y = base_y + step * 0.42
             c.setStrokeColor(DOT_GRAY)
             c.setDash(1, 2)
-            c.setLineWidth(0.8)
             c.line(x + pad, dotted_y, x + w - pad, dotted_y)
             c.setDash()
+
+    if corner_note:
+        c.setFont("Helvetica-Bold", 7.8)
+        c.setFillColor(BLUE)
+        c.drawRightString(x + w - pad, y + 5, corner_note)
 
     return y
 
 
+def draw_star(c, cx, cy, r, stroke, line_width=1):
+    """Outlined five-point star, left empty for colouring in."""
+    p = c.beginPath()
+    for k in range(10):
+        rad = r if k % 2 == 0 else r * 0.42
+        ang = math.radians(90 + k * 36)
+        px, py = cx + rad * math.cos(ang), cy + rad * math.sin(ang)
+        if k == 0:
+            p.moveTo(px, py)
+        else:
+            p.lineTo(px, py)
+    p.close()
+    c.setStrokeColor(stroke)
+    c.setLineWidth(line_width)
+    c.setLineJoin(1)
+    c.drawPath(p, stroke=1, fill=0)
+
+
+def draw_face(c, cx, cy, r, mood):
+    """Outlined face for circling/colouring: mood is 'happy', 'okay' or 'sad'."""
+    c.setStrokeColor(LINE_GRAY)
+    c.setLineWidth(0.9)
+    c.circle(cx, cy, r, stroke=1, fill=0)
+    c.setFillColor(LINE_GRAY)
+    c.circle(cx - r * 0.35, cy + r * 0.25, r * 0.11, stroke=0, fill=1)
+    c.circle(cx + r * 0.35, cy + r * 0.25, r * 0.11, stroke=0, fill=1)
+    mw = r * 0.5
+    if mood == "happy":
+        c.arc(cx - mw, cy - r * 0.6, cx + mw, cy + r * 0.1, 200, 140)
+    elif mood == "sad":
+        c.arc(cx - mw, cy - r * 0.75, cx + mw, cy - r * 0.05, 20, 140)
+    else:
+        c.line(cx - mw * 0.8, cy - r * 0.35, cx + mw * 0.8, cy - r * 0.35)
+
+
+FOOTER_PANEL_H = 70
+
+
 def draw_footer_panel(c, cfg, top_y):
     x, w = MARGIN, PAGE_W - 2 * MARGIN
-    box_h = 50
+    box_h = FOOTER_PANEL_H
     y = top_y - box_h
     rounded_rect(c, x, y, w, box_h, 4, stroke=BOX_BORDER, line_width=1)
 
     pad = 16
-    split = x + w * 0.66
+    split = x + w * 0.64
     c.setStrokeColor(BOX_BORDER)
     c.setLineWidth(1)
     c.line(split, y + 7, split, y + box_h - 7)
 
-    ty = top_y - 13
+    ty = top_y - 14
     name = cfg.get("student_name", "Writer")
     c.setFont("Helvetica-Bold", 8.7)
     c.setFillColor(INK)
     c.drawString(x + pad, ty, f"{name.upper()}'S DETECTIVE CHECKLIST")
 
     items = cfg.get("checklist_items") or DEFAULTS["checklist_items"]
-    col1 = items[0::2]
-    col2 = items[1::2]
+    half = (len(items) + 1) // 2
+    col1 = items[:half]
+    col2 = items[half:]
     box_sz = 8.5
-    row_h = 13
-    cy = ty - 14
+    row_h = 14.5
+    cy = ty - 17
 
     left_region_w = split - x
     col_gap = 10
@@ -426,10 +623,13 @@ def draw_footer_panel(c, cfg, top_y):
             c.setStrokeColor(GRAY)
             c.setLineWidth(1)
             c.rect(cx, yy - 1.5, box_sz, box_sz, stroke=1, fill=0)
-            c.setFont("Helvetica", 8)
             c.setFillColor(INK)
             text_w = col_w - box_sz - 6
-            it_lines = wrap_text(it, "Helvetica", 8, text_w) or [it]
+            size = 8
+            while stringWidth(it, "Helvetica", size) > text_w and size > 6.8:
+                size -= 0.2
+            c.setFont("Helvetica", size)
+            it_lines = wrap_text(it, "Helvetica", size, text_w) or [it]
             c.drawString(cx + box_sz + 6, yy, it_lines[0])
             for extra in it_lines[1:]:
                 yy -= 9
@@ -439,18 +639,134 @@ def draw_footer_panel(c, cfg, top_y):
     draw_checks(col1, col1_x)
     draw_checks(col2, col2_x)
 
-    rx = split + 16
-    c.setFont("Helvetica-Bold", 9.3)
+    # Right side: things for the child to colour / circle herself.
+    rx = split + 14
+    label_font, label_size = "Helvetica-Bold", 8.7
+    icons_x = rx + max(stringWidth(t, label_font, label_size)
+                       for t in ("My effort:", "Writing felt:")) + 10
+
+    c.setFont(label_font, label_size)
     c.setFillColor(INK)
-    c.drawString(rx, ty, "Today's Effort:")
-    star_x = rx + stringWidth("Today's Effort: ", "Helvetica-Bold", 9.3)
-    c.setFont("Helvetica", 12)
-    c.setFillColor(HexColor("#F59E0B"))
-    c.drawString(star_x, ty - 1, "\u2605 \u2605 \u2605 \u2605 \u2605")
+    c.drawString(rx, ty, "My effort:")
+    for k in range(5):
+        draw_star(c, icons_x + 6 + k * 16, ty + 3, 6.3, STAR_GOLD, line_width=1.1)
+
+    fy = ty - 19
+    c.setFont(label_font, label_size)
+    c.setFillColor(INK)
+    c.drawString(rx, fy, "Writing felt:")
+    for k, mood in enumerate(("happy", "okay", "sad")):
+        draw_face(c, icons_x + 6 + k * 20, fy + 3, 6.8, mood)
 
     c.setFont("Helvetica", 8.3)
     c.setFillColor(GRAY)
-    c.drawString(rx, ty - 19, "Favorite word " + name + " used: " + "." * 16)
+    c.drawString(rx, ty - 39, "Best word I used: " + "." * 24)
+
+    return y
+
+
+def draw_continued_header(c, cfg, top_y):
+    """Slim page-2 header: title, writer, date, and the topic again."""
+    c.setStrokeColor(PAGE_BORDER)
+    c.setLineWidth(1)
+    c.line(MARGIN, top_y, PAGE_W - MARGIN, top_y)
+
+    baseline = top_y - 20
+    c.setFont("Helvetica-Bold", 13)
+    c.setFillColor(NAVY)
+    c.drawString(MARGIN, baseline, "Daily Creative Spark")
+    tw = stringWidth("Daily Creative Spark", "Helvetica-Bold", 13)
+    c.setFont("Helvetica", 9)
+    c.setFillColor(GRAY)
+    c.drawString(MARGIN + tw + 8, baseline, "\u2022  page 2")
+
+    name = cfg.get("student_name", "")
+    c.setFont("Helvetica", 8.5)
+    c.setFillColor(INK)
+    right = PAGE_W - MARGIN
+    c.drawRightString(right, baseline, "Date: " + "." * 18)
+    date_w = stringWidth("Date: " + "." * 18, "Helvetica", 8.5)
+    c.setFont("Helvetica-Bold", 8.5)
+    c.drawRightString(right - date_w - 18, baseline, name)
+    c.setFont("Helvetica", 8.5)
+    c.drawRightString(right - date_w - 18 - stringWidth(name, "Helvetica-Bold", 8.5),
+                      baseline, "Writer: ")
+
+    rule_y = top_y - 29
+    c.setStrokeColor(NAVY)
+    c.setLineWidth(2.2)
+    c.line(MARGIN, rule_y, PAGE_W - MARGIN, rule_y)
+
+    topic = cfg.get("topic_title", "")
+    if topic:
+        c.setFont("Helvetica-Bold", 11)
+        c.setFillColor(INK)
+        lines = wrap_text(topic, "Helvetica-Bold", 11, PAGE_W - 2 * MARGIN) or [""]
+        ty = rule_y - 16
+        c.drawString(MARGIN, ty, lines[0])
+        return ty - 9
+    return rule_y - 9
+
+
+EDIT_PANEL_H = 84
+
+
+def draw_edit_panel(c, cfg, top_y):
+    """Page-2 "Edit & improve" box: upgrade two words, count sentences and
+    paragraphs, and a line for a grown-up's comment."""
+    x, w = MARGIN, PAGE_W - 2 * MARGIN
+    box_h = EDIT_PANEL_H
+    y = top_y - box_h
+    rounded_rect(c, x, y, w, box_h, 4, fill=BLUE_LIGHT_BG)
+    c.setFillColor(GREEN)
+    c.rect(x, y, 4, box_h, stroke=0, fill=1)
+
+    pad = 16
+    split = x + w * 0.5
+    ty = top_y - 15
+    c.setFont("Helvetica-Bold", 9.5)
+    c.setFillColor(INK)
+    c.drawString(x + pad, ty, "EDIT & IMPROVE")
+    c.setFont("Helvetica-Oblique", 8)
+    c.setFillColor(GRAY)
+    c.drawString(x + pad + stringWidth("EDIT & IMPROVE  ", "Helvetica-Bold", 9.5), ty,
+                 "Read your story out loud first!")
+
+    # left: upgrade two plain words
+    c.setFont("Helvetica", 8.5)
+    c.setFillColor(INK)
+    c.drawString(x + pad, ty - 18, "Swap 2 plain words for stronger ones:")
+    for k in range(2):
+        ry = ty - 38 - k * 18
+        c.setFont("Helvetica", 8.5)
+        c.setFillColor(GRAY)
+        c.drawString(x + pad, ry, "." * 26)
+        ax = x + pad + stringWidth("." * 26, "Helvetica", 8.5) + 8
+        c.setStrokeColor(GREEN)
+        c.setLineWidth(1.2)
+        c.line(ax, ry + 3, ax + 14, ry + 3)
+        p = c.beginPath()
+        p.moveTo(ax + 18, ry + 3)
+        p.lineTo(ax + 13, ry + 6)
+        p.lineTo(ax + 13, ry)
+        p.close()
+        c.setFillColor(GREEN)
+        c.drawPath(p, stroke=0, fill=1)
+        c.setFillColor(GRAY)
+        c.drawString(ax + 26, ry, "." * 26)
+
+    # right: counts and a grown-up's comment
+    rx = split + 14
+    c.setFont("Helvetica", 8.5)
+    c.setFillColor(INK)
+    c.drawString(rx, ty - 18, "I wrote ........ sentences in ........ paragraphs.")
+    c.drawString(rx, ty - 38, "Grown-up's comment:")
+    c.setFillColor(GRAY)
+    cw = stringWidth("Grown-up's comment: ", "Helvetica", 8.5)
+    dots = int((x + w - pad - rx - cw) / stringWidth(".", "Helvetica", 8.5))
+    c.drawString(rx + cw, ty - 38, "." * dots)
+    full = int((x + w - pad - rx) / stringWidth(".", "Helvetica", 8.5))
+    c.drawString(rx, ty - 56, "." * full)
 
     return y
 
@@ -471,24 +787,44 @@ def draw_page_footer(c, cfg, bottom_y):
 
 def _render(c, cfg):
     c.setTitle(f"Daily Creative Spark - {cfg.get('day_label', '')}".strip())
+    two_pages = int(cfg.get("pages") or 1) >= 2
+    name = cfg.get("student_name", "Writer")
+
+    # ----- page 1: the quest, ideas, plan, and the start of the story -----
     top_y = PAGE_H - MARGIN
     rule_y = draw_header(c, cfg, top_y)
     y = draw_quest_box(c, cfg, rule_y - 9)
     y = draw_two_column(c, cfg, y - 9)
-    footer_reserved = 50 + 9 + 19
-    story_bottom = footer_reserved + MARGIN
-    y = draw_story_area(c, cfg, y - 9, story_bottom)
+    if cfg.get("plan_labels"):
+        y = draw_plan_strip(c, cfg, y - 9)
+    story_bottom = MARGIN + 23 + FOOTER_PANEL_H + 5
+    y = draw_story_area(
+        c, cfg, y - 9, story_bottom, f"{name}'s Story",
+        hint="Start a new paragraph for the middle and the end",
+        n_rows=cfg.get("story_lines"),
+        corner_note="Keep going on page 2  \u00bb" if two_pages else "",
+    )
     y2 = draw_footer_panel(c, cfg, y - 5)
     draw_page_footer(c, cfg, y2 - 8)
     c.showPage()
+
+    # ----- page 2: more writing space + edit & improve -----
+    if two_pages:
+        y = draw_continued_header(c, cfg, PAGE_H - MARGIN)
+        story_bottom = MARGIN + 23 + EDIT_PANEL_H + 5
+        y = draw_story_area(c, cfg, y, story_bottom, f"{name}'s Story (continued)",
+                            hint="Remember: new paragraph = new line, start a little in")
+        y2 = draw_edit_panel(c, cfg, y - 5)
+        draw_page_footer(c, cfg, y2 - 8)
+        c.showPage()
+
     c.save()
 
 
 def generate(cfg, out_path):
     """Render cfg to a PDF file on disk."""
-    full_cfg = {**DEFAULTS, **cfg}
-    c = canvas.Canvas(out_path, pagesize=A4)
-    _render(c, full_cfg)
+    with open(out_path, "wb") as f:
+        f.write(generate_bytes(cfg))
 
 
 def generate_bytes(cfg):
@@ -528,6 +864,7 @@ def slugify(text):
 
 _TOP_BULLET_RE = re.compile(r"^\s*[*\-\u2022]\s*(.+?)\s*:\s*(.*)$")
 _NUMBERED_RE = re.compile(r"^\s*(\d+)[.)]\s*(.*)$")
+_VAULT_TICK_RE = re.compile(r"`([^`]+)`\s*(?:\(([^)]*)\)|[=:]\s*([^,`]+))?")
 _DAY_HEADER_RE = re.compile(r"^\s*(Day\s+\S+(?:\s*\([^)]*\))?)\s*:?\s*(.*)$", re.IGNORECASE)
 
 
@@ -608,9 +945,15 @@ def parse_prompt(text):
                 instr_m = re.search(r"\(([^)]*)\)", label)
                 if instr_m:
                     cfg["vault_instruction"] = instr_m.group(1).strip()
-                words = re.findall(r"`([^`]+)`", value)
+                # `drenched` (very wet), `gloomy` = dark and sad, `cosy`
+                words = []
+                for word, paren, eq in _VAULT_TICK_RE.findall(value):
+                    meaning = (paren or eq).strip()
+                    words.append([word.strip(), meaning] if meaning else word.strip())
                 if not words:
-                    words = [w.strip().strip('"\u201c\u201d') for w in value.split(",") if w.strip()]
+                    # no backticks: split on commas that aren't inside (...)
+                    words = [w.strip().strip('"\u201c\u201d')
+                             for w in re.split(r",(?![^()]*\))", value) if w.strip()]
                 cfg["word_vault"] = words
                 continue
 
@@ -654,7 +997,7 @@ EXAMPLE_PROMPT = """Day 2 (Tuesday): Sensory Description
    1. What sounds do the raindrops make against the glass or on the balcony?
    2. What do the streets and trees look like when it pours?
    3. What is your favourite thing to eat, drink, or do while listening to the storm?
-* Word Vault (Aim for 3): `pattered`, `gloomy`, `splashed`, `cosy`, `drenched`
+* Word Vault (Aim for 3): `pattered` (tapped lightly), `gloomy` (dark and sad), `splashed` (water jumped up), `cosy` (warm and snug), `drenched` (very, very wet)
 * Star Challenge (Optional): Describe the rain puddles without using the word "water".
 """
 
