@@ -70,6 +70,7 @@
       background: var(--blue-light); border: 1px solid #bfdbfe; border-radius: 8px;
       padding: 14px 16px; margin-bottom: 18px;
     }
+    .gen.chart { background: #fffbeb; border-color: #fde68a; }
     .gen-title { font-weight: 600; font-size: 14px; color: var(--navy); margin-bottom: 10px; }
     .gen-row { display: flex; gap: 12px; align-items: flex-end; flex-wrap: wrap; }
     .gen-row .grow { flex: 1 1 200px; }
@@ -170,6 +171,25 @@
           </ol>
           <textarea id="chat_text" readonly></textarea>
           <button type="button" class="gen-btn secondary" onclick="copyChatText()">Copy message</button>
+        </div>
+      </div>
+
+      <div class="gen chart">
+        <div class="gen-title">Monthly star chart <span class="gen-note">colour a star each day she writes</span></div>
+        <div class="gen-row">
+          <div>
+            <label for="chart_month">Month</label>
+            <select id="chart_month" name="chart_month">
+              {% for value, label in chart_months %}<option value="{{ value }}">{{ label }}</option>{% endfor %}
+            </select>
+          </div>
+          <div>
+            <label for="chart_week_start">Week starts on</label>
+            <select id="chart_week_start" name="chart_week_start">
+              {% for d in ["Saturday", "Sunday", "Monday"] %}<option value="{{ d }}">{{ d }}</option>{% endfor %}
+            </select>
+          </div>
+          <button type="submit" formaction="{{ url_for('star_chart_pdf') }}" class="gen-btn secondary">&#11088; Print star chart</button>
         </div>
       </div>
 

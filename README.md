@@ -70,6 +70,7 @@ app.py                 Flask web app (the routes)
 prompt_generator.py     "Make today's prompt" — Gemini / Claude / copy-for-chat
 prompt_bank.py          "Pick from prompt bank" — hands out the next unused prompt
 prompt_bank.json        the 70 ready-written prompts (10 per weekday); add your own here
+star_chart.py           the printable monthly writing star chart
 worksheet.py            Core module: PDF drawing engine + prompt parser
                         (also runnable as a CLI — see below)
 templates/index.html    The single-page form + history UI
@@ -132,6 +133,23 @@ uses British spelling, and avoids topics from your recent worksheets. The
 request never includes her name or school; the name is only added
 locally. The weekly plan and the instructions live at the top of
 `prompt_generator.py` if you want to change them.
+
+### Monthly star chart
+
+Below the prompt box is **Monthly star chart**. Pick the month (this month or
+one of the next two) and the day your week starts on (Saturday, Sunday or
+Monday), then press **Print star chart**. You get one A4 page:
+
+- **A calendar for the month.** Each day has an empty star to colour on days
+  she writes, and the writing type for that weekday (Character, Senses,
+  Dialogue...).
+- **My streaks:** stars this month, longest streak, and best story.
+- **Milestones:** badges at 5, 10, 15, 20 and 25 stars to colour in.
+- **My reward:** "When I colour __ stars, my reward is __", signed by her and
+  a grown-up, plus "I'm proud of myself because…".
+
+It uses the name and footer from Settings. Star charts appear in *Recent
+worksheets*, but their titles aren't treated as story topics.
 
 ### API keys (optional)
 

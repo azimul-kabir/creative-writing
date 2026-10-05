@@ -14,6 +14,7 @@ POST /generate    parse the pasted prompt, render a PDF, save it to
                    OUTPUT_DIR, stream it back to the browser (inline, so it
                    opens in the browser's PDF viewer ready to print/save)
 POST /pack        a week of worksheets from the prompt bank in one PDF
+POST /star-chart  a printable monthly writing star chart
 GET  /download/<name>   re-download a PDF from history
 POST /api/generate-prompt   start asking Gemini/Claude for a day's prompt
                    in the background; returns a job id
@@ -40,6 +41,7 @@ from flask import (
 
 import prompt_bank
 import prompt_generator
+import star_chart
 import worksheet
 
 # send INFO logs (e.g. how long Gemini took) to stdout, i.e. `docker logs`
@@ -90,6 +92,7 @@ def index():
         history=_history(),
         weekdays=prompt_generator.WEEKDAYS,
         weekly_plan=prompt_generator.WEEKLY_PLAN,
+        chart_months=star_chart.month_choices(),
         provider=prompt_generator.active_provider(),
     )
 
@@ -101,6 +104,8 @@ def _recent_topics(limit=14):
         try:
             meta = json.loads(_meta_path(f).read_text(encoding="utf-8"))
         except (OSError, ValueError):
+            continue
+        if meta.get("kind") == "chart":
             continue
         # a week pack lists its seven topics; a single sheet has one
         for topic in meta.get("topics") or [meta.get("topic_title")]:
@@ -270,6 +275,29 @@ def pack():
         "topics": [c.get("topic_title", "") for c in cfgs],
     }
     return _save_and_send(pdf_bytes, f"week_pack_{first.isoformat()}", meta)
+
+
+@app.route("/star-chart", methods=["POST"])
+def star_chart_pdf():
+    """A month's colour-in star chart, for the month and week start picked."""
+    try:
+        year, month = (int(p) for p in (request.form.get("chart_month") or "").split("-"))
+        datetime.date(year, month, 1)
+    except ValueError:
+        today = datetime.date.today()
+        year, month = today.year, today.month
+    week_start = request.form.get("chart_week_start")
+    if week_start not in prompt_generator.WEEKDAYS:
+        week_start = "Saturday"
+
+    pdf_bytes = star_chart.star_chart_bytes(
+        year, month, week_start,
+        student_name=(request.form.get("student_name") or "").strip() or None,
+        footer_left=(request.form.get("footer_left") or "").strip() or None,
+    )
+    label = datetime.date(year, month, 1).strftime("%B %Y")
+    meta = {"day_label": "Star chart", "topic_title": label, "kind": "chart"}
+    return _save_and_send(pdf_bytes, f"star_chart_{year:04d}_{month:02d}", meta)
 
 
 def _apply_overrides(cfg):
