@@ -7,7 +7,9 @@ services:
     ports:
       - "5000:5000"
     volumes:
-      # generated worksheets persist here across container restarts/updates
+      # everything the app saves lives here and survives restarts/updates:
+      # worksheets, prompt-bank progress, the progress database and the
+      # portfolio photos - back this folder up
       - ./data:/data
     environment:
       # Change these to suit your child/class — every field is also
@@ -23,9 +25,10 @@ services:
       # in the repo):
       #   GEMINI_API_KEY=...      free, from https://aistudio.google.com/apikey
       #   ANTHROPIC_API_KEY=...   paid, from https://console.anthropic.com
-      # With no key, "Copy for Gemini / Claude chat" still works.
+      # With no key, the prompt bank and "Copy for Gemini / Claude chat"
+      # still work.
       GEMINI_API_KEY: "${GEMINI_API_KEY:-}"
       ANTHROPIC_API_KEY: "${ANTHROPIC_API_KEY:-}"
       # PROMPT_PROVIDER: "claude"   # use Claude even when both keys are set
-      TZ: "Asia/Dhaka"
+      TZ: "Asia/Dhaka"              # so "today" and printed dates are right
       # SECRET_KEY: "change-me"   # optional, only used for flash messages
