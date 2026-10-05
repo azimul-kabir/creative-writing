@@ -71,6 +71,8 @@ prompt_generator.py     "Make today's prompt" — Gemini / Claude / copy-for-cha
 prompt_bank.py          "Pick from prompt bank" — hands out the next unused prompt
 prompt_bank.json        the 70 ready-written prompts (10 per weekday); add your own here
 star_chart.py           the printable monthly writing star chart
+progress.py             progress tracker & portfolio: storage, stats, sentences chart
+templates/progress.html the Progress & portfolio page
 worksheet.py            Core module: PDF drawing engine + prompt parser
                         (also runnable as a CLI — see below)
 templates/index.html    The single-page form + history UI
@@ -183,6 +185,37 @@ When running locally without Docker, `export GEMINI_API_KEY=...` before
 **Paste-back tip:** the prompt box accepts text pasted from a chat app
 as-is. Code fences, **bold** labels and a "Here's your prompt!" line
 are all ignored.
+
+## Progress & portfolio
+
+The **Progress & portfolio** link at the top of the main page opens a page
+for keeping track of her writing over the term.
+
+**Log a finished worksheet.** Fill in:
+- the date and topic (recent topics are suggested as you type);
+- a **photo of the pages** (on a phone this offers the camera);
+- sentences, paragraphs and Vault words used;
+- which **Detective checklist** habits she managed;
+- her own **stars** and **face**;
+- a note from you.
+
+In *Recent worksheets*, each sheet's **Log it** link opens the form with the
+topic and writing type already filled in.
+
+**See progress at a glance:**
+- stories logged, this month, current and longest streak;
+- average sentences in her last 5 stories, compared with her first 5;
+- a chart of sentences per story, with the 10–15 goal marked;
+- how often she manages each checklist habit, most-missed first;
+- average sentences by writing type.
+
+**The portfolio** keeps every logged story, newest first, with its photo,
+numbers and your note. Tap a photo to see it full size.
+
+Everything is stored on the NAS in the data folder: `data/progress.db` (a
+SQLite database) and `data/portfolio/` (the photos). It's covered by the same
+volume, so it survives rebuilds; back up `data/` to keep it safe. Uploads are
+limited to 40 MB at a time.
 
 ## The prompt format
 

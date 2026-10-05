@@ -117,7 +117,8 @@
 <body>
   <div class="wrap">
     <h1>Daily Creative Spark</h1>
-    <p class="tag">Paste a day's writing prompt below and get a print-ready worksheet PDF.</p>
+    <p class="tag">Paste a day's writing prompt below and get a print-ready worksheet PDF.
+      <a class="dl" href="{{ url_for('progress_page') }}">&#128200; Progress &amp; portfolio &rarr;</a></p>
 
     {% with messages = get_flashed_messages() %}
       {% if messages %}
@@ -256,7 +257,7 @@
               {% if h.title %}{{ h.title }}<div class="fname">{{ h.name }}</div>{% else %}{{ h.name }}{% endif %}
             </td>
             <td class="created">{{ h.mtime }}</td>
-            <td class="dl-cell"><a class="dl" href="{{ url_for('download', name=h.name) }}">Download</a></td>
+            <td class="dl-cell"><a class="dl" href="{{ url_for('download', name=h.name) }}">Download</a>{% if h.log_url %} &middot; <a class="dl" href="{{ h.log_url }}">Log it</a>{% endif %}</td>
           </tr>
           {% endfor %}
         </table>
