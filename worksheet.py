@@ -44,6 +44,9 @@ line_spacing_mm   : float gap between ruled lines, default 9
 guide_lines       : bool  dotted mid-line for letter sizing, default off
 pages             : int   2 (default) adds a full lined writing page with
                     an "Edit & improve" box; 1 = single sheet
+date_text         : str   optional; printed in the header's Date box
+                    (e.g. "11 Oct"), otherwise a dotted blank
+day_name          : str   optional; printed in the header's Day box
 footer_left       : str
 footer_right      : str
 """
@@ -207,8 +210,10 @@ def draw_header(c, cfg, top_y):
             c.drawString(vx, y, "." * int(dotted_width / 3.0))
         return x_start
 
-    day_x = right_field("Day:", "", right_edge - 8, dotted_width=38)
-    date_x = right_field("Date:", "", day_x - 20, dotted_width=55)
+    day_x = right_field("Day:", cfg.get("day_name", ""), right_edge - 8,
+                        dotted_width=38, bold_value=True)
+    date_x = right_field("Date:", cfg.get("date_text", ""), day_x - 20,
+                         dotted_width=55, bold_value=True)
     writer_x = right_field("Writer:", cfg.get("student_name", ""), date_x - 16, bold_value=True)
 
     badge_text = cfg.get("class_label", "") or cfg.get("day_label", "")
@@ -684,8 +689,17 @@ def draw_continued_header(c, cfg, top_y):
     c.setFont("Helvetica", 8.5)
     c.setFillColor(INK)
     right = PAGE_W - MARGIN
-    c.drawRightString(right, baseline, "Date: " + "." * 18)
-    date_w = stringWidth("Date: " + "." * 18, "Helvetica", 8.5)
+    date_text = cfg.get("date_text", "")
+    if date_text:
+        c.setFont("Helvetica-Bold", 8.5)
+        c.drawRightString(right, baseline, date_text)
+        date_w = stringWidth(date_text, "Helvetica-Bold", 8.5)
+        c.setFont("Helvetica", 8.5)
+        c.drawRightString(right - date_w, baseline, "Date: ")
+        date_w += stringWidth("Date: ", "Helvetica", 8.5)
+    else:
+        c.drawRightString(right, baseline, "Date: " + "." * 18)
+        date_w = stringWidth("Date: " + "." * 18, "Helvetica", 8.5)
     c.setFont("Helvetica-Bold", 8.5)
     c.drawRightString(right - date_w - 18, baseline, name)
     c.setFont("Helvetica", 8.5)
@@ -787,6 +801,12 @@ def draw_page_footer(c, cfg, bottom_y):
 
 def _render(c, cfg):
     c.setTitle(f"Daily Creative Spark - {cfg.get('day_label', '')}".strip())
+    _draw_worksheet(c, cfg)
+    c.save()
+
+
+def _draw_worksheet(c, cfg):
+    """Draw one worksheet (1 or 2 pages) onto the canvas, without saving."""
     two_pages = int(cfg.get("pages") or 1) >= 2
     name = cfg.get("student_name", "Writer")
 
@@ -818,8 +838,6 @@ def _render(c, cfg):
         draw_page_footer(c, cfg, y2 - 8)
         c.showPage()
 
-    c.save()
-
 
 def generate(cfg, out_path):
     """Render cfg to a PDF file on disk."""
@@ -833,6 +851,17 @@ def generate_bytes(cfg):
     buf = io.BytesIO()
     c = canvas.Canvas(buf, pagesize=A4)
     _render(c, full_cfg)
+    return buf.getvalue()
+
+
+def generate_pack_bytes(cfgs, title="Daily Creative Spark - week pack"):
+    """Render several worksheets, one after another, into a single PDF."""
+    buf = io.BytesIO()
+    c = canvas.Canvas(buf, pagesize=A4)
+    c.setTitle(title)
+    for cfg in cfgs:
+        _draw_worksheet(c, {**DEFAULTS, **cfg})
+    c.save()
     return buf.getvalue()
 
 

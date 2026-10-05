@@ -70,6 +70,9 @@ app.py                 Flask web app (the routes)
 prompt_generator.py     "Make today's prompt" — Gemini / Claude / copy-for-chat
 prompt_bank.py          "Pick from prompt bank" — hands out the next unused prompt
 prompt_bank.json        the 70 ready-written prompts (10 per weekday); add your own here
+star_chart.py           the printable monthly writing star chart
+progress.py             progress tracker & portfolio: storage, stats, sentences chart
+templates/progress.html the Progress & portfolio page
 worksheet.py            Core module: PDF drawing engine + prompt parser
                         (also runnable as a CLI — see below)
 templates/index.html    The single-page form + history UI
@@ -110,6 +113,13 @@ form makes one for you:
      again from the first. Used prompts are remembered in
      `data/prompt_bank_used.json`; delete that file to start the whole
      bank over.
+   - **Print a week from the bank** makes **one PDF with 7
+     worksheets**, starting from the day you picked (choose Saturday for
+     a Saturday-to-Friday week). Each sheet gets the next unused bank
+     prompt for its day, and with *print dates on the sheets* ticked,
+     its Date and Day boxes are filled in (e.g. "11 Oct", "Sat"). It
+     uses your Settings, so with 2 pages per sheet it's 14 pages: print
+     double-sided and there's one sheet of paper per day.
    - **Generate today's prompt** (needs an API key, see below). The
      prompt box fills in by itself, usually within a minute.
    - **Copy for Gemini / Claude chat** (no key needed). This copies a
@@ -125,6 +135,23 @@ uses British spelling, and avoids topics from your recent worksheets. The
 request never includes her name or school; the name is only added
 locally. The weekly plan and the instructions live at the top of
 `prompt_generator.py` if you want to change them.
+
+### Monthly star chart
+
+Below the prompt box is **Monthly star chart**. Pick the month (this month or
+one of the next two) and the day your week starts on (Saturday, Sunday or
+Monday), then press **Print star chart**. You get one A4 page:
+
+- **A calendar for the month.** Each day has an empty star to colour on days
+  she writes, and the writing type for that weekday (Character, Senses,
+  Dialogue...).
+- **My streaks:** stars this month, longest streak, and best story.
+- **Milestones:** badges at 5, 10, 15, 20 and 25 stars to colour in.
+- **My reward:** "When I colour __ stars, my reward is __", signed by her and
+  a grown-up, plus "I'm proud of myself because…".
+
+It uses the name and footer from Settings. Star charts appear in *Recent
+worksheets*, but their titles aren't treated as story topics.
 
 ### API keys (optional)
 
@@ -158,6 +185,37 @@ When running locally without Docker, `export GEMINI_API_KEY=...` before
 **Paste-back tip:** the prompt box accepts text pasted from a chat app
 as-is. Code fences, **bold** labels and a "Here's your prompt!" line
 are all ignored.
+
+## Progress & portfolio
+
+The **Progress & portfolio** link at the top of the main page opens a page
+for keeping track of her writing over the term.
+
+**Log a finished worksheet.** Fill in:
+- the date and topic (recent topics are suggested as you type);
+- a **photo of the pages** (on a phone this offers the camera);
+- sentences, paragraphs and Vault words used;
+- which **Detective checklist** habits she managed;
+- her own **stars** and **face**;
+- a note from you.
+
+In *Recent worksheets*, each sheet's **Log it** link opens the form with the
+topic and writing type already filled in.
+
+**See progress at a glance:**
+- stories logged, this month, current and longest streak;
+- average sentences in her last 5 stories, compared with her first 5;
+- a chart of sentences per story, with the 10–15 goal marked;
+- how often she manages each checklist habit, most-missed first;
+- average sentences by writing type.
+
+**The portfolio** keeps every logged story, newest first, with its photo,
+numbers and your note. Tap a photo to see it full size.
+
+Everything is stored on the NAS in the data folder: `data/progress.db` (a
+SQLite database) and `data/portfolio/` (the photos). It's covered by the same
+volume, so it survives rebuilds; back up `data/` to keep it safe. Uploads are
+limited to 40 MB at a time.
 
 ## The prompt format
 
