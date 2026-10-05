@@ -130,8 +130,8 @@ GEMINI_API_KEY=...
   is far more than one prompt a day. On the free tier, Google may use
   requests to improve its products. It tries `gemini-3.8-flash` first.
   If that model is overloaded ("high demand") or its free quota is used
-  up, it moves on to `gemini-3.7-flash`, then `gemini-3.5-flash`, all
-  within 45 seconds. To change the list, set `GEMINI_MODEL` to
+  up, it moves on to `gemini-3.7-flash`, then `gemini-3.5-flash`. Each
+  model gets up to 15 seconds, and all of them 45 seconds together. To change the list, set `GEMINI_MODEL` to
   comma-separated model IDs.
 - **Claude** (`ANTHROPIC_API_KEY`, from
   [console.anthropic.com](https://console.anthropic.com)) is paid
