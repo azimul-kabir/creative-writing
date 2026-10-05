@@ -14,6 +14,9 @@ POST /generate    parse the pasted prompt, render a PDF, save it to
                    OUTPUT_DIR, stream it back to the browser (inline, so it
                    opens in the browser's PDF viewer ready to print/save)
 GET  /download/<name>   re-download a PDF from history
+POST /api/generate-prompt   ask Gemini/Claude for a day's prompt (JSON
+                   in/out), used by the "Generate today's prompt" button
+POST /api/chat-prompt   the same request as text to paste into a chat app
 GET  /healthz     plain 200 OK, for Docker/Synology health checks
 """
 
@@ -24,9 +27,10 @@ from pathlib import Path
 
 from flask import (
     Flask, request, render_template, send_file, abort, redirect,
-    url_for, flash,
+    url_for, flash, jsonify,
 )
 
+import prompt_generator
 import worksheet
 
 app = Flask(__name__)
@@ -72,7 +76,56 @@ def index():
         example_prompt=worksheet.EXAMPLE_PROMPT,
         defaults=worksheet.DEFAULTS,
         history=_history(),
+        weekdays=prompt_generator.WEEKDAYS,
+        weekly_plan=prompt_generator.WEEKLY_PLAN,
+        provider=prompt_generator.active_provider(),
     )
+
+
+def _recent_topics(limit=14):
+    files = sorted(OUTPUT_DIR.glob("*.pdf"), key=lambda p: p.stat().st_mtime, reverse=True)
+    topics = []
+    for f in files[:limit]:
+        try:
+            meta = json.loads(_meta_path(f).read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            continue
+        if meta.get("topic_title") and meta["topic_title"] not in topics:
+            topics.append(meta["topic_title"])
+    return topics
+
+
+def _generator_args():
+    body = request.get_json(silent=True) or {}
+    weekday = body.get("weekday") or ""
+    if weekday not in prompt_generator.WEEKLY_PLAN:
+        return None
+    return dict(
+        weekday=weekday,
+        student_name=(body.get("student_name") or "").strip() or worksheet.DEFAULTS["student_name"],
+        theme=(body.get("theme") or "")[:200],
+        recent_topics=_recent_topics(),
+    )
+
+
+@app.route("/api/generate-prompt", methods=["POST"])
+def api_generate_prompt():
+    args = _generator_args()
+    if args is None:
+        return jsonify(error="Pick a day of the week."), 400
+    try:
+        text = prompt_generator.generate_prompt_text(**args)
+    except prompt_generator.PromptGenerationError as exc:
+        return jsonify(error=str(exc)), 502
+    return jsonify(prompt_text=text)
+
+
+@app.route("/api/chat-prompt", methods=["POST"])
+def api_chat_prompt():
+    args = _generator_args()
+    if args is None:
+        return jsonify(error="Pick a day of the week."), 400
+    return jsonify(chat_text=prompt_generator.chat_prompt_text(**args))
 
 
 @app.route("/generate", methods=["POST"])

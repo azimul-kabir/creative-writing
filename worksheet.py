@@ -904,11 +904,18 @@ def parse_prompt(text):
     if text.startswith("{"):
         return json.loads(text)
 
-    lines = text.splitlines()
+    # Replies pasted from a chat app may carry ``` fences, **bold** labels,
+    # "## " headings, or a chatty first line before the prompt itself.
+    lines = [
+        re.sub(r"^\s*#+\s*", "", ln.replace("**", ""))
+        for ln in text.splitlines()
+        if not ln.strip().startswith("```")
+    ]
     cfg = {}
 
-    # First non-empty line: "Day 2 (Tuesday): Sensory Description"
-    i = 0
+    # The "Day 2 (Tuesday): Sensory Description" line; anything above it
+    # is skipped.
+    i = next((n for n, ln in enumerate(lines) if re.match(r"\s*Day\s+\d", ln, re.I)), 0)
     while i < len(lines) and not lines[i].strip():
         i += 1
     if i < len(lines):
