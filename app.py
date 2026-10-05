@@ -18,6 +18,7 @@ POST /api/generate-prompt   start asking Gemini/Claude for a day's prompt
                    in the background; returns a job id
 GET  /api/generate-prompt/<id>   poll that job: pending / done / error
 POST /api/chat-prompt   the same request as text to paste into a chat app
+POST /api/bank-prompt   the next unused prompt from the built-in prompt bank
 GET  /healthz     plain 200 OK, for Docker/Synology health checks
 """
 
@@ -35,6 +36,7 @@ from flask import (
     url_for, flash, jsonify,
 )
 
+import prompt_bank
 import prompt_generator
 import worksheet
 
@@ -173,6 +175,14 @@ def api_generate_prompt_status(job_id):
     if path is None or not path.exists():
         return jsonify(status="error", error="That request has expired - try again."), 404
     return jsonify(json.loads(path.read_text(encoding="utf-8")))
+
+
+@app.route("/api/bank-prompt", methods=["POST"])
+def api_bank_prompt():
+    args = _generator_args()
+    if args is None:
+        return jsonify(error="Pick a day of the week."), 400
+    return jsonify(prompt_bank.pick_next(args["weekday"], OUTPUT_DIR, args["student_name"]))
 
 
 @app.route("/api/chat-prompt", methods=["POST"])

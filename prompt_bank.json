@@ -1,0 +1,1276 @@
+{
+  "Monday": [
+    {
+      "id": "mon-01",
+      "topic_title": "The New Girl with the Yellow Umbrella",
+      "prompt_starter": "On Monday morning, a new girl walked into our classroom carrying a bright yellow umbrella, even though the sun was shining...",
+      "chat_questions": [
+        "What does she look like, from her shoes to her hair?",
+        "Why might she feel nervous on her first day?",
+        "What makes you think she could be a kind friend?"
+      ],
+      "word_vault": [
+        ["freckled", "with tiny brown spots"],
+        ["cheerful", "happy and smiley"],
+        ["shy", "quiet with new people"],
+        ["curious", "wants to know things"],
+        ["gentle", "soft and kind"]
+      ],
+      "challenge": "Write two sentences about how she feels inside, using 'because' in each one."
+    },
+    {
+      "id": "mon-02",
+      "topic_title": "My Nanu's Magic Kitchen",
+      "prompt_starter": "Nanu tucked the end of her sari into her waist, rolled up her sleeves, and soon the whole kitchen smelled of...",
+      "chat_questions": [
+        "What does your grandmother, or a grown-up you love, look like when she cooks?",
+        "What does she say or do that makes you laugh?",
+        "Why is she so special to you?"
+      ],
+      "word_vault": [
+        ["wrinkled", "with little lines"],
+        ["patient", "calm while waiting"],
+        ["wise", "knows a lot"],
+        ["twinkling", "shining like stars"],
+        ["generous", "loves to share"]
+      ],
+      "challenge": "Describe her hands without using the word 'old'."
+    },
+    {
+      "id": "mon-03",
+      "topic_title": "The Rickshaw Puller Who Sang",
+      "prompt_starter": "Every morning, the rickshaw bell rang ting-ting outside our gate, and Rahim Chacha began to sing the same happy song...",
+      "chat_questions": [
+        "What does his rickshaw look like, with all its colours and pictures?",
+        "What song might he sing, and why does it make him happy?",
+        "How does he look after the children he carries?"
+      ],
+      "word_vault": [
+        ["sturdy", "strong and solid"],
+        ["weathered", "worn by sun and rain"],
+        ["hardworking", "works very hard"],
+        ["jolly", "full of fun"],
+        ["loyal", "always stays true"]
+      ],
+      "challenge": "Use 'because' twice to explain why everyone on the street likes him."
+    },
+    {
+      "id": "mon-04",
+      "topic_title": "The Robot Who Wanted a Friend",
+      "prompt_starter": "Behind the old toy shop, I found a small silver robot with one blinking blue eye, and it was holding a sign that said 'HELLO?'...",
+      "chat_questions": [
+        "What parts does the robot have, and what colour are they?",
+        "Why do you think the robot is lonely?",
+        "What could you teach the robot about being a good friend?"
+      ],
+      "word_vault": [
+        ["rusty", "old, orange metal"],
+        ["clanking", "loud metal noise"],
+        ["lonely", "sad and alone"],
+        ["hopeful", "expects good things"],
+        ["clever", "quick at thinking"]
+      ],
+      "challenge": "Give the robot one funny habit and explain why it does it."
+    },
+    {
+      "id": "mon-05",
+      "topic_title": "The Bravest Cat on Our Street",
+      "prompt_starter": "A thin ginger cat with one torn ear sat on our boundary wall, watching the crows as if it owned the whole street...",
+      "chat_questions": [
+        "How does the cat move when it is hunting or playing?",
+        "How do you think it got a torn ear?",
+        "What makes this cat braver than the others?"
+      ],
+      "word_vault": [
+        ["scruffy", "messy and untidy"],
+        ["nimble", "quick and light"],
+        ["fearless", "not scared at all"],
+        ["proud", "pleased with itself"],
+        ["mischievous", "loves playful tricks"]
+      ],
+      "challenge": "Describe the cat's eyes using two describing words before the noun."
+    },
+    {
+      "id": "mon-06",
+      "topic_title": "The Giant Who Was Afraid of Mice",
+      "prompt_starter": "The giant was taller than our whole building, but when a tiny grey mouse squeaked at his feet, he...",
+      "chat_questions": [
+        "How big is the giant compared to things you know?",
+        "Why do you think he is scared of mice?",
+        "How could a small child help him feel brave?"
+      ],
+      "word_vault": [
+        ["enormous", "very, very big"],
+        ["timid", "easily scared"],
+        ["trembling", "shaking with fear"],
+        ["clumsy", "often bumps things"],
+        ["tender-hearted", "very kind inside"]
+      ],
+      "challenge": "Compare the giant's size to something huge you have seen in Dhaka."
+    },
+    {
+      "id": "mon-07",
+      "topic_title": "Our Teacher on Sports Day",
+      "prompt_starter": "When the whistle blew for the teachers' race, our teacher kicked off her shoes, tied up her hair and...",
+      "chat_questions": [
+        "What does your teacher usually look like in class?",
+        "How is she different on Sports Day?",
+        "Why do all the children cheer for her?"
+      ],
+      "word_vault": [
+        ["energetic", "full of energy"],
+        ["determined", "will not give up"],
+        ["sporty", "good at games"],
+        ["encouraging", "helps others try"],
+        ["breathless", "out of breath"]
+      ],
+      "challenge": "Write one sentence about how she looks and one about how she feels."
+    },
+    {
+      "id": "mon-08",
+      "topic_title": "The Pirate Parrot of Cox's Bazar",
+      "prompt_starter": "A parrot with a tiny black eye-patch landed on my sandcastle bucket at Cox's Bazar and squawked, 'Treasure!'...",
+      "chat_questions": [
+        "What colours are the parrot's feathers?",
+        "What naughty things might a pirate parrot do on the beach?",
+        "Why do you think the parrot chose you?"
+      ],
+      "word_vault": [
+        ["vivid", "very bright"],
+        ["squawking", "making loud bird cries"],
+        ["cheeky", "rude in a funny way"],
+        ["sly", "good at sneaky tricks"],
+        ["loyal", "always stays by you"]
+      ],
+      "challenge": "Describe the parrot without using the word 'green'."
+    },
+    {
+      "id": "mon-09",
+      "topic_title": "The Sleepy Dragon Under My Bed",
+      "prompt_starter": "Something warm was snoring under my bed, and when I peeped over the edge, I saw a tiny purple dragon curled up like a cat...",
+      "chat_questions": [
+        "How big is the dragon, and what does its skin feel like?",
+        "Why is the dragon so sleepy?",
+        "What does it like, and what does it hate?"
+      ],
+      "word_vault": [
+        ["scaly", "covered in hard flakes"],
+        ["drowsy", "very sleepy"],
+        ["grumpy", "cross and moody"],
+        ["puffing", "blowing out air"],
+        ["adorable", "very cute"]
+      ],
+      "challenge": "Use 'because' to explain why the dragon chose to hide under your bed."
+    },
+    {
+      "id": "mon-10",
+      "topic_title": "My Baby Cousin, the Little Tornado",
+      "prompt_starter": "The moment my baby cousin arrived for Eid, every toy in the house started to disappear, one by one...",
+      "chat_questions": [
+        "What does your cousin look like when she laughs or cries?",
+        "What messy or funny things does she do?",
+        "Why do you still love her so much?"
+      ],
+      "word_vault": [
+        ["chubby", "round and soft"],
+        ["giggly", "laughs a lot"],
+        ["messy", "very untidy"],
+        ["adventurous", "loves exploring"],
+        ["precious", "very special"]
+      ],
+      "challenge": "Write one sentence that is funny and one that shows how much you love her."
+    }
+  ],
+  "Tuesday": [
+    {
+      "id": "tue-01",
+      "topic_title": "The Monsoon Rooftop",
+      "prompt_starter": "The first fat raindrops splashed onto our rooftop, and suddenly the air smelled of wet soil and...",
+      "chat_questions": [
+        "What can you hear when heavy rain hits the roof?",
+        "How does the cool, wet air feel on your skin?",
+        "What do the plants and flower pots look like after the rain?"
+      ],
+      "word_vault": [
+        ["pattering", "light tapping sound"],
+        ["drenched", "very, very wet"],
+        ["earthy", "smells like soil"],
+        ["glistening", "shining when wet"],
+        ["gushing", "flowing very fast"]
+      ],
+      "challenge": "Write a describing-word pair for the sky and another for the puddles."
+    },
+    {
+      "id": "tue-02",
+      "topic_title": "Inside the Night Market",
+      "prompt_starter": "Strings of tiny lights swung above the stalls, and the smell of hot, spicy jhalmuri drifted towards me...",
+      "chat_questions": [
+        "What delicious smells float through the market?",
+        "What noises do the sellers and shoppers make?",
+        "Which colours and shapes catch your eye first?"
+      ],
+      "word_vault": [
+        ["sizzling", "hot frying sound"],
+        ["fragrant", "smells lovely"],
+        ["bustling", "busy and noisy"],
+        ["glittering", "sparkling brightly"],
+        ["crunchy", "makes a crisp sound"]
+      ],
+      "challenge": "Use all five senses somewhere in your writing."
+    },
+    {
+      "id": "tue-03",
+      "topic_title": "A Morning in the Tea Garden",
+      "prompt_starter": "The green hills of the tea garden in Sylhet were wrapped in a cool, soft mist when I stepped outside...",
+      "chat_questions": [
+        "What do the tea bushes look like in their long rows?",
+        "What sounds can you hear so early in the morning?",
+        "How does the cool mist feel on your face?"
+      ],
+      "word_vault": [
+        ["misty", "full of thin cloud"],
+        ["emerald", "bright jewel green"],
+        ["dewy", "wet with tiny drops"],
+        ["peaceful", "calm and quiet"],
+        ["rolling", "gently up and down"]
+      ],
+      "challenge": "Describe the mist without using the word 'white'."
+    },
+    {
+      "id": "tue-04",
+      "topic_title": "The Secret Garden Behind the Wall",
+      "prompt_starter": "I pushed open the creaky green door in the old wall, and behind it was a garden full of...",
+      "chat_questions": [
+        "Which flowers and trees grow in the secret garden?",
+        "What does the garden smell like?",
+        "What tiny creatures live there?"
+      ],
+      "word_vault": [
+        ["tangled", "twisted together"],
+        ["blooming", "full of flowers"],
+        ["buzzing", "humming like bees"],
+        ["velvety", "soft like velvet"],
+        ["hidden", "out of sight"]
+      ],
+      "challenge": "Write an expanded noun phrase for three different things in the garden."
+    },
+    {
+      "id": "tue-05",
+      "topic_title": "Under the Sea at Saint Martin's Island",
+      "prompt_starter": "I took a deep breath, dipped my face under the clear blue water near Saint Martin's Island, and suddenly I could see...",
+      "chat_questions": [
+        "What colours are the fish and the coral?",
+        "How does the water feel on your arms and legs?",
+        "What sounds are there under the sea?"
+      ],
+      "word_vault": [
+        ["shimmering", "shining and wobbly"],
+        ["swaying", "moving side to side"],
+        ["slippery", "hard to hold"],
+        ["turquoise", "a blue-green colour"],
+        ["silent", "with no sound"]
+      ],
+      "challenge": "Compare the coral to something you would see on land."
+    },
+    {
+      "id": "tue-06",
+      "topic_title": "Our Kitchen on Eid Morning",
+      "prompt_starter": "Before the sun was even up, our kitchen was full of steam, clattering pots and the sweet smell of...",
+      "chat_questions": [
+        "Which foods are cooking, and how do they smell?",
+        "What sounds does the busy kitchen make?",
+        "What is the very first thing you taste?"
+      ],
+      "word_vault": [
+        ["steaming", "giving off hot mist"],
+        ["clattering", "loud banging sounds"],
+        ["sugary", "very sweet"],
+        ["golden", "shiny yellow-brown"],
+        ["mouth-watering", "makes you hungry"]
+      ],
+      "challenge": "Describe one sweet dish without using 'yummy' or 'nice'."
+    },
+    {
+      "id": "tue-07",
+      "topic_title": "The Silent Snowy Forest",
+      "prompt_starter": "When I opened my eyes, I was standing in a silent forest covered in deep, sparkling snow, and my breath made little clouds...",
+      "chat_questions": [
+        "How does the cold snow feel under your feet and in your hands?",
+        "What do the tall trees look like?",
+        "What small sounds break the silence?"
+      ],
+      "word_vault": [
+        ["frosty", "very cold and icy"],
+        ["crunchy", "crisp under your feet"],
+        ["glittering", "sparkling brightly"],
+        ["towering", "very, very tall"],
+        ["hushed", "very quiet"]
+      ],
+      "challenge": "Start one sentence with a sound word, like 'Crunch!'."
+    },
+    {
+      "id": "tue-08",
+      "topic_title": "The Train Ride to the Village",
+      "prompt_starter": "The train rattled out of Kamalapur Station, and through the window I could see...",
+      "chat_questions": [
+        "What do you see from the train window as the city ends?",
+        "What sounds does the train make?",
+        "What smells drift in from outside, or from the snacks?"
+      ],
+      "word_vault": [
+        ["rattling", "shaking with noise"],
+        ["golden", "shiny yellow"],
+        ["endless", "going on forever"],
+        ["whistling", "high, sharp sound"],
+        ["cosy", "warm and snug"]
+      ],
+      "challenge": "Describe the paddy fields with two describing words before the noun."
+    },
+    {
+      "id": "tue-09",
+      "topic_title": "A Thunderstorm from Under My Blanket",
+      "prompt_starter": "I was snuggled under my blanket when a flash of light filled my bedroom, and then the thunder rumbled like...",
+      "chat_questions": [
+        "What does the thunder sound like to you?",
+        "What can you see through the window when the lightning flashes?",
+        "What makes you feel cosy and safe inside?"
+      ],
+      "word_vault": [
+        ["rumbling", "low, rolling sound"],
+        ["flickering", "flashing on and off"],
+        ["howling", "loud wind noise"],
+        ["snug", "warm and comfy"],
+        ["dazzling", "very, very bright"]
+      ],
+      "challenge": "Finish this simile in your story: 'The thunder sounded like...'"
+    },
+    {
+      "id": "tue-10",
+      "topic_title": "The Floating Guava Market",
+      "prompt_starter": "Our little wooden boat bumped against a boat piled high with green guavas, and the boatman called out...",
+      "chat_questions": [
+        "Which fruits and vegetables can you see on the boats?",
+        "What sounds do the boats and the sellers make?",
+        "How does the river smell, and how does the water feel?"
+      ],
+      "word_vault": [
+        ["bobbing", "moving up and down"],
+        ["ripe", "ready to eat"],
+        ["lapping", "gentle water sound"],
+        ["juicy", "full of juice"],
+        ["crowded", "full of people"]
+      ],
+      "challenge": "Write about the river using touch, sound and smell."
+    }
+  ],
+  "Wednesday": [
+    {
+      "id": "wed-01",
+      "topic_title": "The Talking Mango Tree",
+      "prompt_starter": "As I reached for the biggest mango, a deep, leafy voice said, 'Excuse me, that one is mine!' and I...",
+      "chat_questions": [
+        "What would a mango tree want to say to you?",
+        "How does the tree's voice sound?",
+        "What would you say back to it?"
+      ],
+      "word_vault": [
+        ["grumbled", "said crossly"],
+        ["whispered", "said very quietly"],
+        ["chuckled", "laughed quietly"],
+        ["demanded", "asked very firmly"],
+        ["replied", "answered back"]
+      ],
+      "challenge": "Write three lines of speech, starting a new line for each new speaker."
+    },
+    {
+      "id": "wed-02",
+      "topic_title": "The Sun and the Moon Have an Argument",
+      "prompt_starter": "Early one morning, I heard the Sun yawn and say, 'It's my turn to shine now,' but the Moon folded its arms and...",
+      "chat_questions": [
+        "What would the Sun say to show off?",
+        "What would the Moon say back?",
+        "How could they stop arguing and share the sky?"
+      ],
+      "word_vault": [
+        ["boasted", "said proudly, showing off"],
+        ["snapped", "said quickly and crossly"],
+        ["sighed", "breathed out sadly"],
+        ["insisted", "said again, firmly"],
+        ["agreed", "said yes"]
+      ],
+      "challenge": "Use a different word for 'said' every time someone speaks."
+    },
+    {
+      "id": "wed-03",
+      "topic_title": "A Phone Call from an Alien",
+      "prompt_starter": "The phone rang, and when I picked it up, a squeaky voice asked, 'Hello, is this planet Earth?' I nearly dropped the phone...",
+      "chat_questions": [
+        "What questions would the alien ask about Earth?",
+        "How would you explain rickshaws or mishti doi to an alien?",
+        "What funny mistakes might the alien make?"
+      ],
+      "word_vault": [
+        ["squeaked", "said in a tiny voice"],
+        ["asked", "said a question"],
+        ["explained", "told how something works"],
+        ["gasped", "breathed in, surprised"],
+        ["giggled", "laughed in a silly way"]
+      ],
+      "challenge": "Write one question and one exclamation inside speech marks."
+    },
+    {
+      "id": "wed-04",
+      "topic_title": "The Day My Shoes Started Talking",
+      "prompt_starter": "As I bent down to tie my laces, my left shoe groaned, 'Not the muddy football field again!' and my right shoe...",
+      "chat_questions": [
+        "What would your shoes complain about?",
+        "Where would your shoes love to go?",
+        "How would your two shoes talk to each other?"
+      ],
+      "word_vault": [
+        ["groaned", "made an unhappy sound"],
+        ["complained", "said what was wrong"],
+        ["muttered", "said quietly and grumpily"],
+        ["cheered", "shouted happily"],
+        ["pleaded", "begged politely"]
+      ],
+      "challenge": "Start a new line every time a different shoe speaks."
+    },
+    {
+      "id": "wed-05",
+      "topic_title": "Interviewing a Tiger in the Sundarbans",
+      "prompt_starter": "I held out my microphone, took a deep breath and asked, 'Mr Tiger, what is the best thing about living in the Sundarbans?'...",
+      "chat_questions": [
+        "What would you ask a Royal Bengal tiger?",
+        "How would the tiger's voice sound?",
+        "What would the tiger want people to know about the forest?"
+      ],
+      "word_vault": [
+        ["roared", "said very loudly"],
+        ["purred", "said softly and happily"],
+        ["wondered", "asked yourself"],
+        ["announced", "told everyone"],
+        ["murmured", "said softly"]
+      ],
+      "challenge": "Ask the tiger three questions and write down all of his answers."
+    },
+    {
+      "id": "wed-06",
+      "topic_title": "Shopping with a Silly Robot",
+      "prompt_starter": "At the supermarket, my robot picked up a watermelon and beeped, 'Is this a giant green egg?' I tried not to laugh as I...",
+      "chat_questions": [
+        "What other silly things would the robot say about the shop?",
+        "How would you explain things to it?",
+        "What would the shopkeeper say?"
+      ],
+      "word_vault": [
+        ["beeped", "made a robot sound"],
+        ["corrected", "fixed a mistake"],
+        ["spluttered", "spoke while laughing"],
+        ["wondered", "asked yourself"],
+        ["exclaimed", "said with excitement"]
+      ],
+      "challenge": "Put a comma before the closing speech marks, like this: 'Hello,' said the robot."
+    },
+    {
+      "id": "wed-07",
+      "topic_title": "The Lost Balloon Asks for Directions",
+      "prompt_starter": "A red balloon floated down to my window and asked in a tiny, worried voice, 'Please, can you help me find my way home?'...",
+      "chat_questions": [
+        "Where did the balloon come from?",
+        "Who else would the balloon ask for help?",
+        "What would the birds and the clouds say to it?"
+      ],
+      "word_vault": [
+        ["called", "said loudly"],
+        ["answered", "said back"],
+        ["fretted", "said worriedly"],
+        ["suggested", "gave an idea"],
+        ["drifted", "floated slowly"]
+      ],
+      "challenge": "Show how the balloon feels by the word you use instead of 'said'."
+    },
+    {
+      "id": "wed-08",
+      "topic_title": "Dinner with a Famous Cricketer",
+      "prompt_starter": "When the doorbell rang, a famous cricketer smiled at me and said, 'I heard your mum makes the best biryani in Dhaka!' I...",
+      "chat_questions": [
+        "What would you ask a cricketer at dinner?",
+        "What batting or bowling tips might they share?",
+        "What funny thing might happen at the dinner table?"
+      ],
+      "word_vault": [
+        ["shouted", "said very loudly"],
+        ["praised", "said something kind"],
+        ["admitted", "told the truth"],
+        ["explained", "told how something works"],
+        ["cheered", "shouted happily"]
+      ],
+      "challenge": "Write a conversation that is at least four lines long."
+    },
+    {
+      "id": "wed-09",
+      "topic_title": "The Grumpy Cloud and the Happy Kite",
+      "prompt_starter": "From our rooftop, I heard the big grey cloud huff, 'Stop flying so high, little kite!' but my kite only laughed and...",
+      "chat_questions": [
+        "Why is the cloud so grumpy today?",
+        "What would the kite say to cheer it up?",
+        "How do the cloud and the kite become friends?"
+      ],
+      "word_vault": [
+        ["huffed", "said crossly, puffing"],
+        ["laughed", "made a happy sound"],
+        ["teased", "joked in a playful way"],
+        ["apologised", "said sorry"],
+        ["sniffed", "made a small sad sound"]
+      ],
+      "challenge": "Write what the cloud says when it finally smiles."
+    },
+    {
+      "id": "wed-10",
+      "topic_title": "The Missing Homework Mystery",
+      "prompt_starter": "My teacher raised one eyebrow and asked, 'So, where is your homework today?' I took a deep breath and...",
+      "chat_questions": [
+        "What excuse would you invent?",
+        "What would the teacher say back?",
+        "Who, or what, really took the homework?"
+      ],
+      "word_vault": [
+        ["stammered", "spoke nervously, with pauses"],
+        ["questioned", "asked many questions"],
+        ["confessed", "told the truth"],
+        ["exclaimed", "said with excitement"],
+        ["murmured", "said softly"]
+      ],
+      "challenge": "Use an exclamation mark inside speech marks at least once."
+    }
+  ],
+  "Thursday": [
+    {
+      "id": "thu-01",
+      "topic_title": "The Magic Rickshaw Ride",
+      "prompt_starter": "I climbed onto the rickshaw, and suddenly it lifted off the road and flew high above the rooftops of Dhaka...",
+      "chat_questions": [
+        "Where would the rickshaw fly first?",
+        "What would you see from the sky?",
+        "How would you get back home again?"
+      ],
+      "word_vault": [
+        ["soared", "flew up high"],
+        ["zoomed", "moved very fast"],
+        ["swooped", "dived down quickly"],
+        ["dizzy", "head spinning"],
+        ["thrilling", "very exciting"]
+      ],
+      "challenge": "Use first, next, then, after that and finally in your story."
+    },
+    {
+      "id": "thu-02",
+      "topic_title": "Lost in the Sundarbans",
+      "prompt_starter": "Our boat drifted around a bend in the river, a gust of wind blew the map out of my hands, and...",
+      "chat_questions": [
+        "What is the first thing you do when you realise you are lost?",
+        "Which animals and birds do you spot along the way?",
+        "How do you find your way back to the group?"
+      ],
+      "word_vault": [
+        ["winding", "with many bends"],
+        ["rustling", "soft leafy sound"],
+        ["muddy", "wet and sticky"],
+        ["cautious", "very careful"],
+        ["relieved", "not worried anymore"]
+      ],
+      "challenge": "Write three sentences that end with exclamation marks."
+    },
+    {
+      "id": "thu-03",
+      "topic_title": "The Treasure Map in the Library Book",
+      "prompt_starter": "When I opened the dusty old library book, a crinkly map fell out with a big red X drawn in the corner...",
+      "chat_questions": [
+        "Where does the map lead you?",
+        "What clues do you follow along the way?",
+        "What is the treasure at the end?"
+      ],
+      "word_vault": [
+        ["crinkly", "full of creases"],
+        ["mysterious", "strange and puzzling"],
+        ["discovered", "found something new"],
+        ["glinting", "flashing little lights"],
+        ["triumphant", "proud of winning"]
+      ],
+      "challenge": "Use 'after that' and 'finally' to order the end of your adventure."
+    },
+    {
+      "id": "thu-04",
+      "topic_title": "A Picnic on the Moon",
+      "prompt_starter": "First, I packed samosas and a flask of tea into my rocket, then I pressed the big red button and...",
+      "chat_questions": [
+        "What happens when you land on the Moon?",
+        "Who, or what, do you meet there?",
+        "What goes wrong at your picnic?"
+      ],
+      "word_vault": [
+        ["blasted", "shot up with force"],
+        ["weightless", "floating with no weight"],
+        ["crater", "big hole on the Moon"],
+        ["astonished", "very, very surprised"],
+        ["bouncing", "jumping up and down"]
+      ],
+      "challenge": "Include a countdown somewhere in your story."
+    },
+    {
+      "id": "thu-05",
+      "topic_title": "The Shrinking Potion",
+      "prompt_starter": "I took one sip of the fizzy purple drink, and suddenly the sofa looked like a mountain and the cat looked like a dinosaur...",
+      "chat_questions": [
+        "What is it like being as small as an ant?",
+        "Which tiny creature helps you?",
+        "How do you grow big again?"
+      ],
+      "word_vault": [
+        ["tiny", "very, very small"],
+        ["gigantic", "very, very big"],
+        ["scurried", "ran with quick steps"],
+        ["wobbled", "shook from side to side"],
+        ["clambered", "climbed with hands and feet"]
+      ],
+      "challenge": "Use 'suddenly' once, and an exclamation mark at the most exciting moment."
+    },
+    {
+      "id": "thu-06",
+      "topic_title": "The Great Shakrain Kite Battle",
+      "prompt_starter": "On Shakrain day, the sky over Old Dhaka was full of kites, and all at once my kite string began to tug...",
+      "chat_questions": [
+        "What does your kite look like?",
+        "What happens when another kite tangles with yours?",
+        "How does the kite battle end?"
+      ],
+      "word_vault": [
+        ["tugged", "pulled hard"],
+        ["soaring", "flying high"],
+        ["tangled", "twisted and knotted"],
+        ["cheering", "shouting happily"],
+        ["victorious", "the winner"]
+      ],
+      "challenge": "Use time connectives to show four steps of the battle."
+    },
+    {
+      "id": "thu-07",
+      "topic_title": "Escape from the Toy Shop",
+      "prompt_starter": "When the toy shop closed for the night, my old teddy bear opened his eyes and whispered, 'Now's our chance!' and...",
+      "chat_questions": [
+        "Which toys escape, and why do they want to leave?",
+        "What gets in their way?",
+        "Where do they go in the end?"
+      ],
+      "word_vault": [
+        ["crept", "moved slowly and quietly"],
+        ["daring", "brave and bold"],
+        ["squeezed", "pushed through a gap"],
+        ["scrambled", "climbed quickly"],
+        ["freedom", "being free"]
+      ],
+      "challenge": "Write the escape in five clear steps, using a time word for each."
+    },
+    {
+      "id": "thu-08",
+      "topic_title": "The Time Machine to the Dinosaurs",
+      "prompt_starter": "I pressed the button marked 'DINOSAURS', and with a flash and a whoosh, I landed right next to a giant...",
+      "chat_questions": [
+        "Which dinosaur do you see first?",
+        "What problem do you have in dinosaur times?",
+        "How do you get back to today?"
+      ],
+      "word_vault": [
+        ["prehistoric", "from long, long ago"],
+        ["thundering", "very loud and booming"],
+        ["ancient", "very, very old"],
+        ["hatching", "breaking out of an egg"],
+        ["escaped", "got away"]
+      ],
+      "challenge": "Use the word 'meanwhile' somewhere in your story."
+    },
+    {
+      "id": "thu-09",
+      "topic_title": "The Balloon Ride over the Paddy Fields",
+      "prompt_starter": "The hot-air balloon rose gently above the village, and soon the paddy fields below looked like a giant green quilt...",
+      "chat_questions": [
+        "What can you see from so high up?",
+        "What happens when the wind suddenly gets strong?",
+        "Where do you finally land?"
+      ],
+      "word_vault": [
+        ["drifting", "floating slowly"],
+        ["gust", "sudden strong wind"],
+        ["patchwork", "lots of little squares"],
+        ["swaying", "moving side to side"],
+        ["landed", "came down safely"]
+      ],
+      "challenge": "Use first, then, after that and finally to order your journey."
+    },
+    {
+      "id": "thu-10",
+      "topic_title": "The Runaway Ice-Cream Cart",
+      "prompt_starter": "The ice-cream cart started rolling down the hill all by itself, and I grabbed my sandals and chased after it...",
+      "chat_questions": [
+        "Where does the cart go as it rolls?",
+        "Who joins the chase?",
+        "How do you finally stop it?"
+      ],
+      "word_vault": [
+        ["rattled", "shook noisily"],
+        ["chased", "ran after"],
+        ["swerved", "turned suddenly"],
+        ["screeched", "made a loud, high sound"],
+        ["panting", "breathing fast"]
+      ],
+      "challenge": "Use exactly three exclamation marks, in the three most exciting places."
+    }
+  ],
+  "Friday": [
+    {
+      "id": "fri-01",
+      "topic_title": "The Lost Puppy at the Park",
+      "prompt_starter": "When I reached the swings, I saw a little brown puppy shivering under the slide, but there was no owner anywhere...",
+      "chat_questions": [
+        "How does the puppy feel, and how can you tell?",
+        "What do you try first to help it?",
+        "How is the puppy's family found?"
+      ],
+      "word_vault": [
+        ["whimpered", "made small sad cries"],
+        ["searched", "looked everywhere"],
+        ["anxious", "very worried"],
+        ["clever", "quick at thinking"],
+        ["reunited", "together again"]
+      ],
+      "challenge": "Use 'because' and 'so' in the same story."
+    },
+    {
+      "id": "fri-02",
+      "topic_title": "The Power Cut at My Birthday Party",
+      "prompt_starter": "Just as my friends arrived for my birthday party, the lights went out, the music stopped and the fan slowly stopped spinning...",
+      "chat_questions": [
+        "What problems does the power cut cause?",
+        "What ideas do you have to save the party?",
+        "How does the party end?"
+      ],
+      "word_vault": [
+        ["gloomy", "dark and sad"],
+        ["torch", "small hand-held light"],
+        ["inventive", "good at new ideas"],
+        ["shadow", "a dark shape"],
+        ["delighted", "very pleased"]
+      ],
+      "challenge": "Write the problem, the plan and the happy ending as three paragraphs."
+    },
+    {
+      "id": "fri-03",
+      "topic_title": "Saving Mr Green, the Class Plant",
+      "prompt_starter": "Our class plant, Mr Green, was drooping sadly in his pot, and the teacher said it was my job to save him...",
+      "chat_questions": [
+        "Why might the plant be so unhappy?",
+        "What do you try to help it get better?",
+        "How can you tell when it is getting stronger?"
+      ],
+      "word_vault": [
+        ["wilting", "drooping and weak"],
+        ["droopy", "hanging down"],
+        ["sprinkled", "scattered little drops"],
+        ["sunlit", "lit by the sun"],
+        ["thriving", "growing strong"]
+      ],
+      "challenge": "Use 'but' to show one idea that did not work."
+    },
+    {
+      "id": "fri-04",
+      "topic_title": "The Kite Stuck in the Coconut Tree",
+      "prompt_starter": "My brand-new kite was stuck at the very top of the coconut tree, and the wind was getting stronger and stronger...",
+      "chat_questions": [
+        "Who could help you get the kite down?",
+        "Which ideas do not work?",
+        "What finally works?"
+      ],
+      "word_vault": [
+        ["stranded", "stuck and can't move"],
+        ["wobbly", "not steady"],
+        ["tangled", "twisted and knotted"],
+        ["brainwave", "sudden clever idea"],
+        ["rescued", "saved from danger"]
+      ],
+      "challenge": "Use 'and', 'but', 'so' and 'because' at least once each."
+    },
+    {
+      "id": "fri-05",
+      "topic_title": "The Mixed-Up Lunchboxes",
+      "prompt_starter": "At lunchtime, I opened my lunchbox and found a sandwich stuffed with green chillies. This was definitely not my lunch...",
+      "chat_questions": [
+        "Whose lunchbox do you have, and how do you find out?",
+        "What problems does the swap cause?",
+        "How do you fix the mix-up?"
+      ],
+      "word_vault": [
+        ["muddled", "mixed up"],
+        ["fiery", "very hot and spicy"],
+        ["puzzled", "not sure what happened"],
+        ["swapped", "changed places"],
+        ["grateful", "full of thanks"]
+      ],
+      "challenge": "End your story with a lesson that someone learns."
+    },
+    {
+      "id": "fri-06",
+      "topic_title": "The Elephant Who Wanted to Come to My Party",
+      "prompt_starter": "The baby elephant really wanted to come to my birthday party, but he was far too big for our front door...",
+      "chat_questions": [
+        "Why does the elephant want to come so much?",
+        "What ideas do you try to make it work?",
+        "How does everyone enjoy the party together?"
+      ],
+      "word_vault": [
+        ["enormous", "very, very big"],
+        ["squashed", "pressed very flat"],
+        ["hopeful", "expects good things"],
+        ["creative", "good at new ideas"],
+        ["celebrated", "had a party"]
+      ],
+      "challenge": "Write one sentence with 'so' and one with 'because'."
+    },
+    {
+      "id": "fri-07",
+      "topic_title": "The Leaky Boat on the River",
+      "prompt_starter": "Halfway across the river, I noticed water seeping into our little boat around my sandals...",
+      "chat_questions": [
+        "What do you notice first?",
+        "How do you and your friends work together?",
+        "How do you get safely back to the riverbank?"
+      ],
+      "word_vault": [
+        ["seeping", "leaking slowly"],
+        ["bailing", "scooping water out"],
+        ["steady", "not wobbly"],
+        ["teamwork", "working together"],
+        ["ashore", "back on land"]
+      ],
+      "challenge": "Show how the characters feel at the start and at the end."
+    },
+    {
+      "id": "fri-08",
+      "topic_title": "The Missing Sports Day Trophy",
+      "prompt_starter": "On the morning of Sports Day, the shiny gold trophy had vanished from the head teacher's desk, and only a muddy footprint was left...",
+      "chat_questions": [
+        "Who could have taken the trophy, and why?",
+        "What clues do you find?",
+        "Where is the trophy found in the end?"
+      ],
+      "word_vault": [
+        ["vanished", "disappeared suddenly"],
+        ["clue", "helps solve a mystery"],
+        ["suspicious", "seems not quite right"],
+        ["detective", "person who solves mysteries"],
+        ["relieved", "not worried anymore"]
+      ],
+      "challenge": "Give your story a surprise ending."
+    },
+    {
+      "id": "fri-09",
+      "topic_title": "The Very Noisy Koel",
+      "prompt_starter": "Every morning at five o'clock, a koel sang so loudly outside my window that nobody in our building could sleep...",
+      "chat_questions": [
+        "Why do you think the bird sings so early?",
+        "What ideas do the neighbours come up with?",
+        "How does everyone end up happy?"
+      ],
+      "word_vault": [
+        ["piercing", "very loud and sharp"],
+        ["bleary", "tired and blurry-eyed"],
+        ["compromise", "both give a little"],
+        ["peaceful", "calm and quiet"],
+        ["chirpy", "cheerful like a bird"]
+      ],
+      "challenge": "Use 'because' to explain the koel's reason for singing."
+    },
+    {
+      "id": "fri-10",
+      "topic_title": "The Science Fair Volcano Disaster",
+      "prompt_starter": "Two minutes before the judges arrived, my science fair volcano wobbled, tipped over and...",
+      "chat_questions": [
+        "What goes wrong with your project?",
+        "How do you fix it so quickly?",
+        "What do the judges say?"
+      ],
+      "word_vault": [
+        ["fizzing", "bubbling with tiny pops"],
+        ["collapsed", "fell down suddenly"],
+        ["frantic", "very worried and rushing"],
+        ["patched", "fixed quickly"],
+        ["proud", "pleased with yourself"]
+      ],
+      "challenge": "Use 'first', 'then' and 'but' to show your quick fix."
+    }
+  ],
+  "Saturday": [
+    {
+      "id": "sat-01",
+      "topic_title": "Dear Diary: My First Swimming Lesson",
+      "prompt_starter": "Dear Diary, today I stood at the edge of the swimming pool, and my knees were shaking...",
+      "chat_questions": [
+        "How did you feel before you got into the water?",
+        "What happened that surprised you?",
+        "How did you feel at the end of the lesson?"
+      ],
+      "word_vault": [
+        ["nervous", "a little bit scared"],
+        ["splashed", "made water jump up"],
+        ["brave", "not afraid to try"],
+        ["floated", "stayed on the water"],
+        ["proud", "pleased with yourself"]
+      ],
+      "challenge": "Write one feeling for the beginning, the middle and the end."
+    },
+    {
+      "id": "sat-02",
+      "topic_title": "A Letter to My Future Self",
+      "prompt_starter": "Dear Future Me, I am writing this when I am eight years old, and today I want to tell you about...",
+      "chat_questions": [
+        "What do you love doing right now?",
+        "What do you hope you can do when you are older?",
+        "What advice would you give your future self?"
+      ],
+      "word_vault": [
+        ["hopeful", "expects good things"],
+        ["treasure", "something very special"],
+        ["remember", "keep in your mind"],
+        ["dream", "something you wish for"],
+        ["grown-up", "an adult"]
+      ],
+      "challenge": "End your letter with a question for your future self."
+    },
+    {
+      "id": "sat-03",
+      "topic_title": "Dear Diary: The Day It Rained Fish",
+      "prompt_starter": "Dear Diary, you will never believe what fell from the sky this afternoon while I was walking home...",
+      "chat_questions": [
+        "What did you see and hear when it started?",
+        "What did the people on your street do?",
+        "How did you feel when it finally stopped?"
+      ],
+      "word_vault": [
+        ["astonished", "very, very surprised"],
+        ["slippery", "hard to hold"],
+        ["flapping", "moving up and down"],
+        ["chaos", "a big messy muddle"],
+        ["unbelievable", "hard to believe"]
+      ],
+      "challenge": "Keep your whole diary entry in the past tense."
+    },
+    {
+      "id": "sat-04",
+      "topic_title": "A Letter to Nanu in the Village",
+      "prompt_starter": "Dear Nanu, I hope you are well. I miss you and your mango pickle so much! Last week, something exciting happened...",
+      "chat_questions": [
+        "What news would you share with your grandparent?",
+        "What do you miss about visiting them?",
+        "What would you like to do together next time?"
+      ],
+      "word_vault": [
+        ["missed", "wished someone was there"],
+        ["exciting", "makes you feel thrilled"],
+        ["homesick", "missing home"],
+        ["delicious", "very tasty"],
+        ["cuddle", "a warm hug"]
+      ],
+      "challenge": "Ask Nanu two questions in your letter."
+    },
+    {
+      "id": "sat-05",
+      "topic_title": "Dear Diary: Eid Day",
+      "prompt_starter": "Dear Diary, this morning I woke up before everyone else because it was finally Eid, and...",
+      "chat_questions": [
+        "What did you wear, and how did you feel in it?",
+        "What did you eat, and who did you visit?",
+        "What was the best moment of the whole day?"
+      ],
+      "word_vault": [
+        ["sparkly", "shining with glitter"],
+        ["salami", "Eid money gift"],
+        ["feast", "a big, special meal"],
+        ["grateful", "full of thanks"],
+        ["exhausted", "very, very tired"]
+      ],
+      "challenge": "Write about one feeling in the morning and one at night."
+    },
+    {
+      "id": "sat-06",
+      "topic_title": "A Thank-You Letter to Our School Guard",
+      "prompt_starter": "Dear Guard Uncle, thank you for opening the school gate with a big smile every single morning, even when it rains...",
+      "chat_questions": [
+        "What does he do to keep everyone safe?",
+        "Can you remember a time he helped you or a friend?",
+        "How could you show him your thanks?"
+      ],
+      "word_vault": [
+        ["thankful", "full of thanks"],
+        ["cheerful", "happy and smiley"],
+        ["protect", "keep safe"],
+        ["dependable", "always there to help"],
+        ["kindness", "being kind"]
+      ],
+      "challenge": "Give three reasons why you are thankful."
+    },
+    {
+      "id": "sat-07",
+      "topic_title": "Dear Diary: The Day I Was Invisible",
+      "prompt_starter": "Dear Diary, this morning I looked in the mirror to brush my hair, and there was nobody there at all...",
+      "chat_questions": [
+        "What did you do first when you found out?",
+        "What funny trouble did you get into?",
+        "How did you become visible again?"
+      ],
+      "word_vault": [
+        ["invisible", "cannot be seen"],
+        ["tiptoed", "walked quietly on toes"],
+        ["mischief", "naughty fun"],
+        ["panicked", "felt suddenly very scared"],
+        ["relieved", "not worried anymore"]
+      ],
+      "challenge": "Write how you felt at three different moments of the day."
+    },
+    {
+      "id": "sat-08",
+      "topic_title": "A Letter to a Pen Pal Far Away",
+      "prompt_starter": "Dear Pen Pal, I live in Dhaka, Bangladesh, a busy city full of rickshaws, crows and the smell of street food...",
+      "chat_questions": [
+        "What would you tell someone far away about Dhaka?",
+        "Which foods or festivals would you describe?",
+        "What would you ask them about their country?"
+      ],
+      "word_vault": [
+        ["crowded", "full of people"],
+        ["colourful", "full of colours"],
+        ["tasty", "good to eat"],
+        ["festival", "special celebration"],
+        ["curious", "wants to know things"]
+      ],
+      "challenge": "Describe one place in Dhaka using three senses."
+    },
+    {
+      "id": "sat-09",
+      "topic_title": "Dear Diary: Our Trip to the Zoo",
+      "prompt_starter": "Dear Diary, today we went to the zoo in Mirpur, and the very first animal I saw was...",
+      "chat_questions": [
+        "Which animals did you see, and what were they doing?",
+        "What made you laugh?",
+        "What was your favourite part, and why?"
+      ],
+      "word_vault": [
+        ["enclosure", "fenced animal home"],
+        ["stripy", "covered in stripes"],
+        ["lazy", "does not want to move"],
+        ["trumpeted", "made an elephant sound"],
+        ["fascinating", "very interesting"]
+      ],
+      "challenge": "Use 'first', 'after that' and 'finally' to show the order of your day."
+    },
+    {
+      "id": "sat-10",
+      "topic_title": "A Letter to the Moon",
+      "prompt_starter": "Dear Moon, every night I look out of my bedroom window and see you shining over the rooftops...",
+      "chat_questions": [
+        "What would you tell the Moon about your day?",
+        "What would you like to ask the Moon?",
+        "How does the Moon make you feel at night?"
+      ],
+      "word_vault": [
+        ["glowing", "shining softly"],
+        ["silvery", "shiny grey-white"],
+        ["lonely", "sad and alone"],
+        ["peaceful", "calm and quiet"],
+        ["wondering", "thinking about things"]
+      ],
+      "challenge": "Add a P.S. at the end of your letter."
+    }
+  ],
+  "Sunday": [
+    {
+      "id": "sun-01",
+      "topic_title": "Imagine If Animals Came to School",
+      "prompt_starter": "Imagine if an elephant sat next to me in maths class! Would he even fit at the desk? On the very first morning...",
+      "chat_questions": [
+        "Which animal would you choose as your classmate?",
+        "What would the animal be good at, or very bad at?",
+        "What funny things would happen at break time?"
+      ],
+      "word_vault": [
+        ["ridiculous", "very, very silly"],
+        ["squeezed", "pushed into a tight space"],
+        ["hilarious", "extremely funny"],
+        ["chaos", "a big messy muddle"],
+        ["unusual", "not normal"]
+      ],
+      "challenge": "Write two questions and two exclamations."
+    },
+    {
+      "id": "sun-02",
+      "topic_title": "Imagine If It Rained Sweets",
+      "prompt_starter": "What if, one morning, the clouds rained chocolates and rosogolla instead of water? I ran outside with my biggest bowl and...",
+      "chat_questions": [
+        "Which sweets would fall from the sky?",
+        "What would people do with their umbrellas?",
+        "What problems might sweet rain cause?"
+      ],
+      "word_vault": [
+        ["sticky", "gluey and clingy"],
+        ["sugary", "very sweet"],
+        ["scrumptious", "very tasty"],
+        ["overflowing", "much too full"],
+        ["delightful", "very pleasing"]
+      ],
+      "challenge": "Start at least one sentence with 'What if...?'"
+    },
+    {
+      "id": "sun-03",
+      "topic_title": "Imagine If You Had a Pet Cloud",
+      "prompt_starter": "What would happen if a small, fluffy cloud followed me home from school and wanted to be my pet? It floated through my window and...",
+      "chat_questions": [
+        "What would your pet cloud eat?",
+        "How could it help you on hot days?",
+        "What trouble might it get into?"
+      ],
+      "word_vault": [
+        ["fluffy", "soft and light"],
+        ["drizzle", "very light rain"],
+        ["floating", "staying up in the air"],
+        ["mischievous", "loves playful tricks"],
+        ["magical", "full of magic"]
+      ],
+      "challenge": "Use an exclamation mark for the most surprising thing your cloud does."
+    },
+    {
+      "id": "sun-04",
+      "topic_title": "Imagine If You Were Head Teacher for a Day",
+      "prompt_starter": "Imagine if I walked through the school gate and everyone said, 'Good morning, Head Teacher!' The first thing I did was...",
+      "chat_questions": [
+        "What new rules would you make?",
+        "What would lunch and break time be like?",
+        "What would you learn about being in charge?"
+      ],
+      "word_vault": [
+        ["announced", "told everyone"],
+        ["responsible", "in charge and careful"],
+        ["surprising", "not what you expected"],
+        ["fair", "the same for everyone"],
+        ["busy", "lots to do"]
+      ],
+      "challenge": "Write three questions you would ask your teachers."
+    },
+    {
+      "id": "sun-05",
+      "topic_title": "Imagine If Dhaka Floated in the Sky",
+      "prompt_starter": "How would it feel if, one morning, our whole city slowly rose up and floated among the clouds? I looked out of my window and...",
+      "chat_questions": [
+        "How would people get from place to place?",
+        "What would you see from your window?",
+        "Would you like it, and why?"
+      ],
+      "word_vault": [
+        ["soaring", "flying high"],
+        ["breezy", "a little bit windy"],
+        ["astonishing", "very surprising"],
+        ["wobbly", "not steady"],
+        ["extraordinary", "very unusual"]
+      ],
+      "challenge": "Use one 'How...?' question and one 'Why...?' question."
+    },
+    {
+      "id": "sun-06",
+      "topic_title": "Imagine If All the Colours Disappeared",
+      "prompt_starter": "What if I woke up and the whole world was grey? No red flowers, no blue sky and no yellow mangoes! I had to find out why...",
+      "chat_questions": [
+        "Which colour would you miss most?",
+        "How could you bring the colours back?",
+        "Which colour would you rescue first, and why?"
+      ],
+      "word_vault": [
+        ["dull", "not bright"],
+        ["faded", "lost its colour"],
+        ["vibrant", "bright and lively"],
+        ["rainbow", "arc of colours"],
+        ["restored", "put back again"]
+      ],
+      "challenge": "Write two exclamations about the colours coming back."
+    },
+    {
+      "id": "sun-07",
+      "topic_title": "Imagine If You Lived Under the Sea",
+      "prompt_starter": "What would my day be like if my house was at the bottom of the sea? When my alarm bubbled in the morning, I...",
+      "chat_questions": [
+        "How would you get to school?",
+        "Who would your neighbours be?",
+        "What would you eat for breakfast?"
+      ],
+      "word_vault": [
+        ["coral", "colourful sea rock"],
+        ["bubbling", "full of bubbles"],
+        ["gliding", "moving smoothly"],
+        ["salty", "tastes of salt"],
+        ["mermaid", "half girl, half fish"]
+      ],
+      "challenge": "Begin your story with a question."
+    },
+    {
+      "id": "sun-08",
+      "topic_title": "Imagine If You Could Fly for One Day",
+      "prompt_starter": "Imagine waking up and floating gently up to the ceiling! Where would I fly first? I opened the window and...",
+      "chat_questions": [
+        "Where would you fly first?",
+        "What would you see from above?",
+        "What problems might flying cause?"
+      ],
+      "word_vault": [
+        ["hovering", "staying still in the air"],
+        ["swooping", "diving down quickly"],
+        ["breathtaking", "very, very amazing"],
+        ["windswept", "blown about by wind"],
+        ["unforgettable", "always remembered"]
+      ],
+      "challenge": "End with an exclamation that shows how you feel."
+    },
+    {
+      "id": "sun-09",
+      "topic_title": "Imagine If the Trees Could Walk",
+      "prompt_starter": "What if the trees in our park pulled up their roots one night and went for a stroll? In the morning, I found...",
+      "chat_questions": [
+        "Where would the trees want to go?",
+        "What would people think when they saw them?",
+        "How would the trees find their way back?"
+      ],
+      "word_vault": [
+        ["stomping", "walking heavily"],
+        ["leafy", "full of leaves"],
+        ["rooted", "stuck in the ground"],
+        ["creaking", "long squeaky sound"],
+        ["wandered", "walked around slowly"]
+      ],
+      "challenge": "Use 'Can you imagine...?' somewhere in your writing."
+    },
+    {
+      "id": "sun-10",
+      "topic_title": "Imagine If You Swapped Places with Your Parent",
+      "prompt_starter": "What would happen if, for one whole day, I was the grown-up and my mum had to go to school? The moment the alarm rang...",
+      "chat_questions": [
+        "What jobs would you have to do?",
+        "What would be fun, and what would be hard?",
+        "What would you learn about your parent?"
+      ],
+      "word_vault": [
+        ["chores", "jobs at home"],
+        ["exhausting", "makes you very tired"],
+        ["bossy", "tells others what to do"],
+        ["appreciate", "feel thankful for"],
+        ["swapped", "changed places"]
+      ],
+      "challenge": "Write two questions and one exclamation."
+    }
+  ]
+}

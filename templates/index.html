@@ -128,7 +128,7 @@
           <span class="gen-note">
             {% if provider == 'gemini' %}using Gemini (free)
             {% elif provider == 'claude' %}using Claude
-            {% else %}no API key set &mdash; use &ldquo;Copy for chat&rdquo;{% endif %}
+            {% else %}no API key &mdash; use the prompt bank or &ldquo;Copy for chat&rdquo;{% endif %}
           </span>
         </div>
         <div class="gen-row">
@@ -149,7 +149,8 @@
           {% if provider %}
           <button type="button" id="gen_btn" class="gen-btn" onclick="generatePrompt()">&#10024; Generate today's prompt</button>
           {% endif %}
-          <button type="button" id="chat_btn" class="gen-btn {% if provider %}secondary{% endif %}" onclick="copyForChat()">&#128203; Copy for Gemini / Claude chat</button>
+          <button type="button" id="bank_btn" class="gen-btn {% if provider %}secondary{% endif %}" onclick="pickFromBank()">&#128218; Pick from prompt bank</button>
+          <button type="button" id="chat_btn" class="gen-btn secondary" onclick="copyForChat()">&#128203; Copy for Gemini / Claude chat</button>
         </div>
         <div id="gen_status" class="gen-status" role="status"></div>
         <div id="chat_panel" class="chat-panel" hidden>
@@ -267,6 +268,31 @@
           + 'Try again, or use "Copy for Gemini / Claude chat".';
       }
       return 'Something went wrong (' + status + ').';
+    }
+
+    // the next unused ready-written prompt for the chosen day: no AI needed
+    async function pickFromBank() {
+      const box = document.getElementById('prompt_text');
+      const status = document.getElementById('gen_status');
+      if (box.value.trim() && !confirm('Replace the prompt that is already in the box?')) return;
+      status.className = 'gen-status';
+      try {
+        const res = await fetch({{ url_for('api_bank_prompt')|tojson }}, {
+          method: 'POST', headers: {'Content-Type': 'application/json'}, body: generatorBody(),
+        });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok || !data.prompt_text) throw new Error(data.error || errorFor(res.status));
+        box.value = data.prompt_text;
+        const day = document.getElementById('gen_weekday').value;
+        let msg = day + ' prompt ' + data.number + ' of ' + data.total + ' from the bank. ';
+        msg += data.restarted ? 'All ' + data.total + ' had been used, so the list started again. '
+                              : data.remaining + ' unused left. ';
+        if (document.getElementById('gen_theme').value.trim()) msg += '(The bank doesn\u2019t use themes.) ';
+        status.textContent = msg + 'Press again for a different one.';
+      } catch (err) {
+        status.className = 'gen-status error';
+        status.textContent = err.message;
+      }
     }
 
     async function copyForChat() {
