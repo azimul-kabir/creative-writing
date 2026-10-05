@@ -6,7 +6,7 @@ WORKDIR /app
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY worksheet.py app.py prompt_generator.py ./
+COPY worksheet.py app.py prompt_generator.py prompt_bank.py prompt_bank.json ./
 COPY templates ./templates
 
 ENV OUTPUT_DIR=/data \

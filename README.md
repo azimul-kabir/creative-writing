@@ -68,6 +68,8 @@ Pick *1 page* under Settings (or set `PAGES: "1"` in
 ```
 app.py                 Flask web app (the routes)
 prompt_generator.py     "Make today's prompt" — Gemini / Claude / copy-for-chat
+prompt_bank.py          "Pick from prompt bank" — hands out the next unused prompt
+prompt_bank.json        the 70 ready-written prompts (10 per weekday); add your own here
 worksheet.py            Core module: PDF drawing engine + prompt parser
                         (also runnable as a CLI — see below)
 templates/index.html    The single-page form + history UI
@@ -79,7 +81,7 @@ docs/                   README hero image + screenshots
                         (docs/hero.html is the hero's source)
 ```
 
-## Make today's prompt (Gemini, Claude, or copy-paste)
+## Make today's prompt (prompt bank, Gemini, Claude, or copy-paste)
 
 Don't want to write the day's prompt yourself? The box at the top of the
 form makes one for you:
@@ -98,8 +100,16 @@ form makes one for you:
    | Saturday | Diary or Letter | first person, past tense, feelings |
    | Sunday | Imagine If... | questions and exclamations |
 
-2. Optionally type a **theme** (space, Eid, a lost kitten...).
-3. Then either:
+2. Optionally type a **theme** (space, Eid, a lost kitten...). The
+   prompt bank ignores themes.
+3. Then pick one of these:
+   - **Pick from prompt bank** (free, offline, instant). Fills in the
+     next unused ready-written prompt for that day. The bank has 70
+     prompts, 10 for each weekday, so it covers 10 weeks. Press it again
+     for a different one. When a day's 10 are all used, that day starts
+     again from the first. Used prompts are remembered in
+     `data/prompt_bank_used.json`; delete that file to start the whole
+     bank over.
    - **Generate today's prompt** (needs an API key, see below). The
      prompt box fills in by itself, usually within a minute.
    - **Copy for Gemini / Claude chat** (no key needed). This copies a
@@ -108,7 +118,7 @@ form makes one for you:
      code block into the prompt box.
 4. Read it over, edit anything, then press **Generate PDF**.
 
-Either way you get a topic, story starter, chat questions, Word Vault
+Every option gives you a topic, story starter, chat questions, Word Vault
 words *with meanings*, and a Star Challenge, written for an 8-year-old in
 Dhaka. It mixes everyday Bangladeshi life with fantasy and adventure,
 uses British spelling, and avoids topics from your recent worksheets. The
