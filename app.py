@@ -3,9 +3,11 @@
 Daily Creative Spark — web app
 ================================
 
-A tiny Flask app that wraps worksheet.py: paste a day's prompt, get a
-print-ready PDF back in the browser. Meant to run in Docker on a Synology
-NAS (see Dockerfile / docker-compose.yml / README.md).
+A small Flask app around worksheet.py: make a day's prompt (from the
+prompt bank, Gemini/Claude, or by hand), get a print-ready worksheet PDF,
+print a week or a monthly star chart, and log finished worksheets on the
+Progress & portfolio page. Meant to run in Docker on a Synology NAS (see
+Dockerfile / docker-compose.yml / README.md).
 
 Routes
 ------
