@@ -26,21 +26,42 @@ a single column and the history list stacks so nothing runs off-screen:
   <img src="docs/screenshots/web-mobile.png" alt="The web app on a phone-width screen, with the example prompt filled in and the recent worksheets stacked" width="280">
 </p>
 
-**The worksheets it produces** — one A4 page each, generated from the
-prompt text alone:
+**The worksheets it produces** — two A4 pages each, generated from the
+prompt text alone and pitched at age 8–9 (Cambridge Stage 3/4):
+
+- **Page 1** has the writing quest, chat questions, a Word Vault with a
+  short meaning under each word, a *Plan it first* strip (Beginning →
+  Middle → End with hint questions), the start of the story, and a
+  checklist of Stage 3/4 writing habits (joining words, paragraphs,
+  speech marks, reading it back). Stars and faces are left empty for the
+  writer to colour in herself.
+- **Page 2** is a full page of ruled lines to carry on the story, with an
+  *Edit & improve* box at the bottom: swap two plain words for stronger
+  ones, count sentences and paragraphs, and a line for a grown-up's
+  comment.
 
 <table>
   <tr>
     <td align="center" width="50%">
-      <img src="docs/screenshots/worksheet-day2.png" alt="Day 2 worksheet: The Busy Rainy Afternoon">
-      <br><sub>Day 2 — <code>examples/day2_prompt.txt</code></sub>
+      <img src="docs/screenshots/worksheet-day2.png" alt="Day 2 worksheet, page 1: The Busy Rainy Afternoon">
+      <br><sub>Day 2, page 1 — <code>examples/day2_prompt.txt</code></sub>
     </td>
     <td align="center" width="50%">
-      <img src="docs/screenshots/worksheet-day3.png" alt="Day 3 worksheet: The Robot Who Lost Its Shadow">
-      <br><sub>Day 3 — a different prompt, same layout</sub>
+      <img src="docs/screenshots/worksheet-day2-page2.png" alt="Day 2 worksheet, page 2: more writing lines and an Edit and improve box">
+      <br><sub>Day 2, page 2 — more writing space</sub>
     </td>
   </tr>
+  <tr>
+    <td align="center" width="50%">
+      <img src="docs/screenshots/worksheet-day4.png" alt="Day 4 worksheet, page 1: The Day My School Bag Grew Wings">
+      <br><sub>Day 4 — <code>examples/day4_prompt.txt</code> (long lines wrap)</sub>
+    </td>
+    <td></td>
+  </tr>
 </table>
+
+Pick *1 page* under Settings (or set `PAGES: "1"` in
+`docker-compose.yml`) if you only want the first sheet.
 
 ## What's in here
 
@@ -73,9 +94,18 @@ Day 2 (Tuesday): Sensory Description
    1. What sounds do the raindrops make against the glass or on the balcony?
    2. What do the streets and trees look like when it pours?
    3. What is your favourite thing to eat, drink, or do while listening to the storm?
-* Word Vault (Aim for 3): `pattered`, `gloomy`, `splashed`, `cosy`, `drenched`
+* Word Vault (Aim for 3): `pattered` (tapped lightly), `gloomy` (dark and sad), `splashed` (water jumped up), `cosy` (warm and snug), `drenched` (very, very wet)
 * Star Challenge (Optional): Describe the rain puddles without using the word "water".
 ```
+
+**Word Vault meanings** are optional: put a short, child-friendly meaning
+in brackets after a word — `` `drenched` (very, very wet) `` — and it's
+printed under that word's chip. `` `drenched` = very wet `` works too
+(brackets are safer if the meaning has a comma). Keep meanings to a few
+words so they fit.
+
+Long topics, story starters and focus skills wrap onto extra lines, and
+the quest box grows to fit them.
 
 The parser is forgiving about label wording (`Story Starter` / `Prompt
 Starter`, `Chat Questions` / `Chat Prompts`, `Challenge` / `Bonus
@@ -175,7 +205,19 @@ if you're sure the repo is otherwise empty.)
 ## Customizing the design
 
 All drawing logic lives in `worksheet.py` (`draw_header`,
-`draw_quest_box`, `draw_two_column`, `draw_story_area`,
-`draw_footer_panel`) — colors are defined once at the top of the file
+`draw_quest_box`, `draw_two_column`, `draw_plan_strip`,
+`draw_story_area`, `draw_footer_panel`) — colors are defined once at the top of the file
 as `HexColor(...)` constants if you want to re-theme it (e.g. for a
 different class or a different color per weekday).
+
+Via JSON input you can also set:
+
+- `plan_labels`: e.g. `["Who?", "Where?", "What happens?"]`, or
+  `[["Beginning", "Who? Where?"], ...]` to add a hint after each label,
+  or `[]` to hide the plan strip
+- `line_spacing_mm`: the gap between writing lines (default 9)
+- `guide_lines`: `true` adds a dotted mid-line for letter sizing, which
+  helps younger writers
+- `story_lines`: a fixed number of page-1 writing lines (by default it
+  fills the space)
+- `pages`: `1` or `2`

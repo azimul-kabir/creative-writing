@@ -17,6 +17,7 @@ GET  /download/<name>   re-download a PDF from history
 GET  /healthz     plain 200 OK, for Docker/Synology health checks
 """
 
+import json
 import os
 import time
 from pathlib import Path
@@ -37,6 +38,19 @@ OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 HISTORY_LIMIT = 30
 
 
+def _meta_path(pdf_path):
+    # each PDF gets a small sidecar with its topic, for the history list
+    return pdf_path.with_suffix(".json")
+
+
+def _read_title(pdf_path):
+    try:
+        meta = json.loads(_meta_path(pdf_path).read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return ""
+    return " \u2014 ".join(v for v in (meta.get("day_label"), meta.get("topic_title")) if v)
+
+
 def _history():
     files = sorted(
         OUTPUT_DIR.glob("*.pdf"), key=lambda p: p.stat().st_mtime, reverse=True
@@ -44,6 +58,7 @@ def _history():
     return [
         {
             "name": f.name,
+            "title": _read_title(f),
             "mtime": time.strftime("%Y-%m-%d %H:%M", time.localtime(f.stat().st_mtime)),
         }
         for f in files
@@ -85,6 +100,8 @@ def generate():
         val = (request.form.get(field) or "").strip()
         if val:
             cfg[field] = val
+    if request.form.get("pages") in ("1", "2"):
+        cfg["pages"] = int(request.form["pages"])
 
     try:
         pdf_bytes = worksheet.generate_bytes(cfg)
@@ -96,11 +113,16 @@ def generate():
     filename = f"{slug}_{int(time.time())}.pdf"
     out_path = OUTPUT_DIR / filename
     out_path.write_bytes(pdf_bytes)
+    _meta_path(out_path).write_text(
+        json.dumps({k: cfg.get(k, "") for k in ("day_label", "topic_title")}),
+        encoding="utf-8",
+    )
 
     # prune old history beyond the limit
     all_files = sorted(OUTPUT_DIR.glob("*.pdf"), key=lambda p: p.stat().st_mtime, reverse=True)
     for old in all_files[HISTORY_LIMIT:]:
         old.unlink(missing_ok=True)
+        _meta_path(old).unlink(missing_ok=True)
 
     return send_file(
         out_path,
@@ -124,4 +146,8 @@ def healthz():
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)), debug=True)
+    app.run(
+        host="0.0.0.0",
+        port=int(os.environ.get("PORT", 5000)),
+        debug=os.environ.get("FLASK_DEBUG") == "1",
+    )
