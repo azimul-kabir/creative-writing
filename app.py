@@ -14,8 +14,9 @@ POST /generate    parse the pasted prompt, render a PDF, save it to
                    OUTPUT_DIR, stream it back to the browser (inline, so it
                    opens in the browser's PDF viewer ready to print/save)
 GET  /download/<name>   re-download a PDF from history
-POST /api/generate-prompt   ask Gemini/Claude for a day's prompt (JSON
-                   in/out), used by the "Generate today's prompt" button
+POST /api/generate-prompt   start asking Gemini/Claude for a day's prompt
+                   in the background; returns a job id
+GET  /api/generate-prompt/<id>   poll that job: pending / done / error
 POST /api/chat-prompt   the same request as text to paste into a chat app
 GET  /healthz     plain 200 OK, for Docker/Synology health checks
 """
@@ -23,7 +24,10 @@ GET  /healthz     plain 200 OK, for Docker/Synology health checks
 import json
 import logging
 import os
+import re
+import threading
 import time
+import uuid
 from pathlib import Path
 
 from flask import (
@@ -112,16 +116,63 @@ def _generator_args():
     )
 
 
+# Generating a prompt can take a minute or two, longer than a reverse proxy
+# lets one request run, so POST starts a background job and the page polls
+# GET until it's done. Jobs are small JSON files under OUTPUT_DIR so any
+# gunicorn worker can answer the poll.
+JOBS_DIR = OUTPUT_DIR / ".jobs"
+JOBS_DIR.mkdir(parents=True, exist_ok=True)
+JOB_MAX_AGE = 3600
+
+
+def _job_path(job_id):
+    if not re.fullmatch(r"[0-9a-f]{32}", job_id or ""):
+        return None
+    return JOBS_DIR / f"{job_id}.json"
+
+
+def _write_job(job_id, data):
+    tmp = JOBS_DIR / f"{job_id}.tmp"
+    tmp.write_text(json.dumps(data), encoding="utf-8")
+    tmp.replace(JOBS_DIR / f"{job_id}.json")
+
+
+def _run_job(job_id, args):
+    try:
+        text = prompt_generator.generate_prompt_text(**args)
+        _write_job(job_id, {"status": "done", "prompt_text": text})
+    except prompt_generator.PromptGenerationError as exc:
+        _write_job(job_id, {"status": "error", "error": str(exc)})
+    except Exception:
+        app.logger.exception("prompt generation failed")
+        _write_job(job_id, {"status": "error", "error": "Something went wrong - check the logs."})
+
+
 @app.route("/api/generate-prompt", methods=["POST"])
 def api_generate_prompt():
     args = _generator_args()
     if args is None:
         return jsonify(error="Pick a day of the week."), 400
-    try:
-        text = prompt_generator.generate_prompt_text(**args)
-    except prompt_generator.PromptGenerationError as exc:
-        return jsonify(error=str(exc)), 502
-    return jsonify(prompt_text=text)
+    if not prompt_generator.active_provider():
+        return jsonify(error="No API key is set - use \"Copy for Gemini / Claude chat\"."), 400
+
+    now = time.time()
+    for old in JOBS_DIR.glob("*.json"):
+        if now - old.stat().st_mtime > JOB_MAX_AGE:
+            old.unlink(missing_ok=True)
+
+    job_id = uuid.uuid4().hex
+    _write_job(job_id, {"status": "pending"})
+    threading.Thread(target=_run_job, args=(job_id, args), daemon=True).start()
+    return jsonify(job_id=job_id), 202
+
+
+@app.route("/api/generate-prompt/<job_id>", methods=["GET"])
+def api_generate_prompt_status(job_id):
+    path = _job_path(job_id)
+    if path is None or not path.exists():
+        return jsonify(status="error", error="That request has expired - try again."), 404
+    return jsonify(json.loads(path.read_text(encoding="utf-8")))
 
 
 @app.route("/api/chat-prompt", methods=["POST"])

@@ -100,8 +100,8 @@ form makes one for you:
 
 2. Optionally type a **theme** (space, Eid, a lost kitten...).
 3. Then either:
-   - **Generate today's prompt** (needs an API key, see below). After
-     10–60 seconds the prompt box fills in by itself.
+   - **Generate today's prompt** (needs an API key, see below). The
+     prompt box fills in by itself, usually within a minute.
    - **Copy for Gemini / Claude chat** (no key needed). This copies a
      ready-made message. Paste it into the Gemini app or claude.ai, which
      your Gemini or Claude subscription covers, then paste the reply's
@@ -131,7 +131,10 @@ GEMINI_API_KEY=...
   requests to improve its products. It tries `gemini-3.8-flash` first.
   If that model is overloaded ("high demand") or its free quota is used
   up, it moves on to `gemini-3.7-flash`, then `gemini-3.5-flash`. Each
-  model gets up to 15 seconds, and all of them 45 seconds together. To change the list, set `GEMINI_MODEL` to
+  model gets up to 40 seconds (the last one gets whatever is left), and
+  all of them 2 minutes together (`PROMPT_TIMEOUT`, in seconds). The page
+  keeps checking back while it waits, so a slow reply isn't cut off by a
+  reverse proxy. To change the list, set `GEMINI_MODEL` to
   comma-separated model IDs.
 - **Claude** (`ANTHROPIC_API_KEY`, from
   [console.anthropic.com](https://console.anthropic.com)) is paid
