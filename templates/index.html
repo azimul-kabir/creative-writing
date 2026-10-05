@@ -84,6 +84,9 @@
     .gen-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 12px; }
     button.gen-btn.secondary { background: #fff; color: var(--navy); border: 1px solid var(--navy); }
     button.gen-btn.secondary:hover { background: var(--blue-light); }
+    .pack-row { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-top: 10px; }
+    .pack-dates { font-weight: 400; font-size: 13px; color: var(--ink); display: flex; gap: 6px; align-items: center; margin: 0; }
+    .gen-hint { font-size: 12.5px; color: var(--gray); margin-top: 6px; }
     .chat-panel { margin-top: 10px; font-size: 13px; }
     .chat-panel ol { margin: 0 0 8px; padding-left: 20px; line-height: 1.6; }
     .chat-panel textarea { min-height: 140px; font-size: 12px; background: #fff; }
@@ -98,7 +101,7 @@
     @media (max-width: 600px) {
       .card { padding: 16px; }
       .settings-grid { grid-template-columns: 1fr; }
-      .gen-row > div, .gen-actions button { flex: 1 1 100%; }
+      .gen-row > div, .gen-actions button, .pack-row button { flex: 1 1 100%; }
       .settings-grid > div.wide { grid-column: span 1; }
       table, tbody, tr, td { display: block; }
       tr.head { display: none; }
@@ -134,7 +137,7 @@
         <div class="gen-row">
           <div>
             <label for="gen_weekday">Day</label>
-            <select id="gen_weekday">
+            <select id="gen_weekday" name="weekday">
               {% for d in weekdays %}
               <option value="{{ d }}">{{ d }} &mdash; {{ weekly_plan[d][0] }}</option>
               {% endfor %}
@@ -152,6 +155,11 @@
           <button type="button" id="bank_btn" class="gen-btn {% if provider %}secondary{% endif %}" onclick="pickFromBank()">&#128218; Pick from prompt bank</button>
           <button type="button" id="chat_btn" class="gen-btn secondary" onclick="copyForChat()">&#128203; Copy for Gemini / Claude chat</button>
         </div>
+        <div class="pack-row">
+          <button type="submit" formaction="{{ url_for('pack') }}" class="gen-btn secondary">&#128467;&#65039; Print a week from the bank</button>
+          <label class="pack-dates"><input type="checkbox" name="pack_dates" value="1" checked> print dates on the sheets</label>
+        </div>
+        <div class="gen-hint">One PDF with 7 worksheets, starting from the day above, each with the next unused bank prompt.</div>
         <div id="gen_status" class="gen-status" role="status"></div>
         <div id="chat_panel" class="chat-panel" hidden>
           <ol>

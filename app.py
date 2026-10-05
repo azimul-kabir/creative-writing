@@ -13,6 +13,7 @@ GET  /            form + recent-generations history
 POST /generate    parse the pasted prompt, render a PDF, save it to
                    OUTPUT_DIR, stream it back to the browser (inline, so it
                    opens in the browser's PDF viewer ready to print/save)
+POST /pack        a week of worksheets from the prompt bank in one PDF
 GET  /download/<name>   re-download a PDF from history
 POST /api/generate-prompt   start asking Gemini/Claude for a day's prompt
                    in the background; returns a job id
@@ -22,6 +23,7 @@ POST /api/bank-prompt   the next unused prompt from the built-in prompt bank
 GET  /healthz     plain 200 OK, for Docker/Synology health checks
 """
 
+import datetime
 import json
 import logging
 import os
@@ -100,8 +102,10 @@ def _recent_topics(limit=14):
             meta = json.loads(_meta_path(f).read_text(encoding="utf-8"))
         except (OSError, ValueError):
             continue
-        if meta.get("topic_title") and meta["topic_title"] not in topics:
-            topics.append(meta["topic_title"])
+        # a week pack lists its seven topics; a single sheet has one
+        for topic in meta.get("topics") or [meta.get("topic_title")]:
+            if topic and topic not in topics:
+                topics.append(topic)
     return topics
 
 
@@ -213,13 +217,7 @@ def generate():
         )
         return redirect(url_for("index"))
 
-    # optional per-request overrides from the "Settings" panel
-    for field in ("student_name", "class_label", "goal", "footer_left", "footer_right"):
-        val = (request.form.get(field) or "").strip()
-        if val:
-            cfg[field] = val
-    if request.form.get("pages") in ("1", "2"):
-        cfg["pages"] = int(request.form["pages"])
+    _apply_overrides(cfg)
 
     try:
         pdf_bytes = worksheet.generate_bytes(cfg)
@@ -228,15 +226,70 @@ def generate():
         return redirect(url_for("index"))
 
     slug = worksheet.slugify(cfg.get("day_label") or cfg.get("topic_title"))
+    meta = {k: cfg.get(k, "") for k in ("day_label", "topic_title")}
+    return _save_and_send(pdf_bytes, slug, meta)
+
+
+@app.route("/pack", methods=["POST"])
+def pack():
+    """A week of worksheets in one PDF: the next unused prompt-bank prompt
+    for each of 7 days, starting from the day picked in the form."""
+    start_day = request.form.get("weekday")
+    if start_day not in prompt_generator.WEEKDAYS:
+        start_day = prompt_generator.WEEKDAYS[datetime.date.today().weekday()]
+    start_idx = prompt_generator.WEEKDAYS.index(start_day)
+    student_name = (request.form.get("student_name") or "").strip() or worksheet.DEFAULTS["student_name"]
+    with_dates = bool(request.form.get("pack_dates"))
+
+    # the first date is the next start_day, today included
+    today = datetime.date.today()
+    first = today + datetime.timedelta(days=(start_idx - today.weekday()) % 7)
+
+    cfgs = []
+    for k in range(7):
+        day = prompt_generator.WEEKDAYS[(start_idx + k) % 7]
+        cfg = worksheet.parse_prompt(prompt_bank.pick_next(day, OUTPUT_DIR, student_name)["prompt_text"])
+        _apply_overrides(cfg)
+        if with_dates:
+            date = first + datetime.timedelta(days=k)
+            cfg["date_text"] = f"{date.day} {date:%b}"
+            cfg["day_name"] = f"{date:%a}"
+        cfgs.append(cfg)
+
+    last = first + datetime.timedelta(days=6)
+    span = f"{first.day} {first:%b} \u2013 {last.day} {last:%b}"
+    try:
+        pdf_bytes = worksheet.generate_pack_bytes(cfgs, title=f"Daily Creative Spark - week of {span}")
+    except Exception as exc:
+        flash(f"Could not generate the PDF: {exc}")
+        return redirect(url_for("index"))
+
+    meta = {
+        "day_label": "Week pack",
+        "topic_title": f"{start_day[:3]}\u2013{prompt_generator.WEEKDAYS[(start_idx + 6) % 7][:3]}, {span}",
+        "topics": [c.get("topic_title", "") for c in cfgs],
+    }
+    return _save_and_send(pdf_bytes, f"week_pack_{first.isoformat()}", meta)
+
+
+def _apply_overrides(cfg):
+    """Optional per-request overrides from the form's "Settings" panel."""
+    for field in ("student_name", "class_label", "goal", "footer_left", "footer_right"):
+        val = (request.form.get(field) or "").strip()
+        if val:
+            cfg[field] = val
+    if request.form.get("pages") in ("1", "2"):
+        cfg["pages"] = int(request.form["pages"])
+
+
+def _save_and_send(pdf_bytes, slug, meta):
+    """Save a PDF (and its sidecar) to the history, prune old ones, and
+    send it back to open in the browser."""
     filename = f"{slug}_{int(time.time())}.pdf"
     out_path = OUTPUT_DIR / filename
     out_path.write_bytes(pdf_bytes)
-    _meta_path(out_path).write_text(
-        json.dumps({k: cfg.get(k, "") for k in ("day_label", "topic_title")}),
-        encoding="utf-8",
-    )
+    _meta_path(out_path).write_text(json.dumps(meta), encoding="utf-8")
 
-    # prune old history beyond the limit
     all_files = sorted(OUTPUT_DIR.glob("*.pdf"), key=lambda p: p.stat().st_mtime, reverse=True)
     for old in all_files[HISTORY_LIMIT:]:
         old.unlink(missing_ok=True)

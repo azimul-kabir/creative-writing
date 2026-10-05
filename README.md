@@ -110,6 +110,13 @@ form makes one for you:
      again from the first. Used prompts are remembered in
      `data/prompt_bank_used.json`; delete that file to start the whole
      bank over.
+   - **Print a week from the bank** makes **one PDF with 7
+     worksheets**, starting from the day you picked (choose Saturday for
+     a Saturday-to-Friday week). Each sheet gets the next unused bank
+     prompt for its day, and with *print dates on the sheets* ticked,
+     its Date and Day boxes are filled in (e.g. "11 Oct", "Sat"). It
+     uses your Settings, so with 2 pages per sheet it's 14 pages: print
+     double-sided and there's one sheet of paper per day.
    - **Generate today's prompt** (needs an API key, see below). The
      prompt box fills in by itself, usually within a minute.
    - **Copy for Gemini / Claude chat** (no key needed). This copies a
