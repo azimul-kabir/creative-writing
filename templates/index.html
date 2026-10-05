@@ -39,6 +39,7 @@
       display: grid; grid-template-columns: 1fr 1fr; gap: 12px 16px; margin-top: 12px;
     }
     .settings-grid > div { grid-column: span 1; }
+    .settings-grid > div.wide { grid-column: span 2; }
     .settings-grid input {
       width: 100%; padding: 8px 10px; border: 1px solid var(--border);
       border-radius: 6px; font-size: 13.5px;
@@ -58,6 +59,7 @@
       font-size: 13px; color: var(--blue); cursor: pointer; text-decoration: underline;
       background: none; border: none; padding: 0; margin-left: 10px; font-weight: 500;
     }
+    .example-link:hover { background: none; }
     table { width: 100%; border-collapse: collapse; font-size: 14px; }
     th, td { text-align: left; padding: 8px 6px; border-bottom: 1px solid #eee; }
     th { color: var(--gray); font-weight: 600; font-size: 12.5px; text-transform: uppercase; }
@@ -65,6 +67,21 @@
     a.dl:hover { text-decoration: underline; }
     .empty { color: var(--gray); font-size: 14px; padding: 8px 0; }
     footer { text-align: center; color: var(--gray); font-size: 12.5px; margin-top: 30px; }
+
+    /* Phones: one settings column, and history rows stacked so long
+       filenames and the Download link never run off the screen. */
+    @media (max-width: 600px) {
+      .card { padding: 16px; }
+      .settings-grid { grid-template-columns: 1fr; }
+      .settings-grid > div.wide { grid-column: span 1; }
+      table, tbody, tr, td { display: block; }
+      tr.head { display: none; }
+      tr { padding: 10px 0; border-bottom: 1px solid #eee; }
+      td { border: none; padding: 2px 0; }
+      td.file { overflow-wrap: anywhere; font-weight: 500; }
+      td.created, td.dl-cell { display: inline-block; font-size: 13px; }
+      td.created { color: var(--gray); margin-right: 14px; }
+    }
   </style>
 </head>
 <body>
@@ -114,7 +131,7 @@
             <label for="footer_left">Footer (left)</label>
             <input type="text" id="footer_left" name="footer_left" placeholder="{{ defaults.footer_left }}">
           </div>
-          <div style="grid-column: span 2;">
+          <div class="wide">
             <label for="footer_right">Footer (right)</label>
             <input type="text" id="footer_right" name="footer_right" placeholder="{{ defaults.footer_right }}">
           </div>
@@ -128,12 +145,12 @@
       <label style="margin-bottom: 10px;">Recent worksheets</label>
       {% if history %}
         <table>
-          <tr><th>File</th><th>Created</th><th></th></tr>
+          <tr class="head"><th>File</th><th>Created</th><th></th></tr>
           {% for h in history %}
           <tr>
-            <td>{{ h.name }}</td>
-            <td>{{ h.mtime }}</td>
-            <td><a class="dl" href="{{ url_for('download', name=h.name) }}">Download</a></td>
+            <td class="file">{{ h.name }}</td>
+            <td class="created">{{ h.mtime }}</td>
+            <td class="dl-cell"><a class="dl" href="{{ url_for('download', name=h.name) }}">Download</a></td>
           </tr>
           {% endfor %}
         </table>

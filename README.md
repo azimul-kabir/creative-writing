@@ -19,6 +19,13 @@ PDF*. Every worksheet you make is kept under *Recent worksheets*.
   <img src="docs/screenshots/web-form.png" alt="The web form with the Day 2 example prompt filled in, the Settings panel open, and three recent worksheets listed" width="760">
 </p>
 
+It also works from a phone on the same network — the layout collapses to
+a single column and the history list stacks so nothing runs off-screen:
+
+<p align="center">
+  <img src="docs/screenshots/web-mobile.png" alt="The web app on a phone-width screen, with the example prompt filled in and the recent worksheets stacked" width="280">
+</p>
+
 **The worksheets it produces** — one A4 page each, generated from the
 prompt text alone:
 
