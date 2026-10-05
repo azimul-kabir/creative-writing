@@ -303,6 +303,8 @@
       }
     }
 
+    const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
     async function generatePrompt() {
       const box = document.getElementById('prompt_text');
       const btn = document.getElementById('gen_btn');
@@ -310,17 +312,40 @@
       if (box.value.trim() && !confirm('Replace the prompt that is already in the box?')) return;
       btn.disabled = true;
       status.className = 'gen-status';
-      status.textContent = 'Claude is writing a prompt… this can take up to a minute.';
+      status.textContent = 'Writing a prompt\u2026';
+      const started = Date.now();
       try {
+        // start the job, then poll: generation can take a minute or two,
+        // longer than a reverse proxy lets a single request run
         const res = await fetch({{ url_for('api_generate_prompt')|tojson }}, {
           method: 'POST',
           headers: {'Content-Type': 'application/json'},
           body: generatorBody(),
         });
-        const data = await res.json().catch(() => ({}));
-        if (!res.ok || !data.prompt_text) throw new Error(data.error || errorFor(res.status));
-        box.value = data.prompt_text;
-        status.textContent = 'Done! Read it over, change anything you like, then press Generate PDF.';
+        const start = await res.json().catch(() => ({}));
+        if (!res.ok || !start.job_id) throw new Error(start.error || errorFor(res.status));
+        const pollUrl = {{ url_for('api_generate_prompt')|tojson }} + '/' + start.job_id;
+
+        while (true) {
+          await sleep(2000);
+          const secs = Math.round((Date.now() - started) / 1000);
+          status.textContent = 'Writing a prompt\u2026 ' + secs + 's (this can take a minute or two)';
+          let job;
+          try {
+            const r = await fetch(pollUrl, {cache: 'no-store'});
+            job = await r.json();
+          } catch (e) {
+            if (secs > 180) throw new Error('Lost contact with the server - try again.');
+            continue;  // a blip; keep polling
+          }
+          if (job.status === 'done') {
+            box.value = job.prompt_text;
+            status.textContent = 'Done! Read it over, change anything you like, then press Generate PDF.';
+            return;
+          }
+          if (job.status === 'error') throw new Error(job.error);
+          if (secs > 180) throw new Error('This is taking too long - try again, or use "Copy for Gemini / Claude chat".');
+        }
       } catch (err) {
         status.className = 'gen-status error';
         status.textContent = err.message;

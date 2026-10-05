@@ -32,10 +32,10 @@ import time
 
 log = logging.getLogger(__name__)
 
-# Stay under the 60 s that reverse proxies (e.g. Synology's) allow by
-# default, so a slow reply ends in our own error message instead of a
-# bare "504 Gateway Timeout" from the proxy.
-REQUEST_TIMEOUT = float(os.environ.get("PROMPT_TIMEOUT", "45"))
+# Total time allowed for one prompt, across every model tried. The web app
+# runs generation in the background and the page polls for the result, so
+# this isn't bound by a reverse proxy's request timeout.
+REQUEST_TIMEOUT = float(os.environ.get("PROMPT_TIMEOUT", "120"))
 
 WEEKDAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
 
@@ -245,12 +245,15 @@ def _ask_gemini(user):
     deadline = time.monotonic() + REQUEST_TIMEOUT
     last_error = None
 
-    for model in GEMINI_MODELS:
+    for i, model in enumerate(GEMINI_MODELS):
         remaining = deadline - time.monotonic()
         if remaining < 5:
             break
         started = time.monotonic()
-        limit = min(remaining, PER_MODEL_TIMEOUT)
+        # the last model gets whatever time is left: when the others fail
+        # fast (busy), there's no one left to save time for
+        is_last = i == len(GEMINI_MODELS) - 1
+        limit = remaining if is_last else min(remaining, PER_MODEL_TIMEOUT)
         try:
             future = _gemini_pool.submit(
                 client.interactions.create,
@@ -267,8 +270,8 @@ def _ask_gemini(user):
                 store=False,
                 timeout=limit,
             )
-            # Google can take ~30 s just to say a model is busy, so each
-            # model gets a share and the others still get their turn
+            # a busy or stuck model can't use up the whole budget, so the
+            # others still get their turn
             interaction = future.result(timeout=limit + 1)
         except concurrent.futures.TimeoutError:
             future.cancel()
