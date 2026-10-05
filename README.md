@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="docs/hero.png" alt="Daily Creative Spark — paste a day's writing prompt, get a print-ready A4 worksheet PDF" width="100%">
+</p>
+
 # creative-writing — Daily Creative Spark worksheet generator
 
 A small web app: paste a day's writing prompt, get back a print-ready
@@ -5,7 +9,31 @@ A small web app: paste a day's writing prompt, get back a print-ready
 worksheet), ready to download or print. Built to run in Docker on a
 Synology NAS, but works anywhere Docker does.
 
-<img src="docs/screenshot.png" alt="" width="0" height="0" style="display:none">
+## Screenshots
+
+**The web app** — paste the prompt (or click *use example*), optionally
+override the student name / class / goal / footer, and hit *Generate
+PDF*. Every worksheet you make is kept under *Recent worksheets*.
+
+<p align="center">
+  <img src="docs/screenshots/web-form.png" alt="The web form with the Day 2 example prompt filled in, the Settings panel open, and three recent worksheets listed" width="760">
+</p>
+
+**The worksheets it produces** — one A4 page each, generated from the
+prompt text alone:
+
+<table>
+  <tr>
+    <td align="center" width="50%">
+      <img src="docs/screenshots/worksheet-day2.png" alt="Day 2 worksheet: The Busy Rainy Afternoon">
+      <br><sub>Day 2 — <code>examples/day2_prompt.txt</code></sub>
+    </td>
+    <td align="center" width="50%">
+      <img src="docs/screenshots/worksheet-day3.png" alt="Day 3 worksheet: The Robot Who Lost Its Shadow">
+      <br><sub>Day 3 — a different prompt, same layout</sub>
+    </td>
+  </tr>
+</table>
 
 ## What's in here
 
@@ -18,6 +46,8 @@ requirements.txt        Python deps
 Dockerfile              Container image
 docker-compose.yml      One-file deploy (works in Synology Container Manager)
 examples/day2_prompt.txt  A sample prompt in the expected format
+docs/                   README hero image + screenshots
+                        (docs/hero.html is the hero's source)
 ```
 
 ## The prompt format
