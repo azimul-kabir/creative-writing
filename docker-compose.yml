@@ -18,4 +18,14 @@ services:
       PAGES: "2"            # 2 = add a full lined writing page; "1" = single sheet
       FOOTER_LEFT: "Scholastica Primary English Support • Stage 3"
       FOOTER_RIGHT: "A4 Daily Writing Challenge Worksheet"
+      # For the "Generate today's prompt" button, put an API key in a file
+      # named .env next to this one (it's git-ignored, so keys never end up
+      # in the repo):
+      #   GEMINI_API_KEY=...      free, from https://aistudio.google.com/apikey
+      #   ANTHROPIC_API_KEY=...   paid, from https://console.anthropic.com
+      # With no key, "Copy for Gemini / Claude chat" still works.
+      GEMINI_API_KEY: "${GEMINI_API_KEY:-}"
+      ANTHROPIC_API_KEY: "${ANTHROPIC_API_KEY:-}"
+      # PROMPT_PROVIDER: "claude"   # use Claude even when both keys are set
+      TZ: "Asia/Dhaka"
       # SECRET_KEY: "change-me"   # optional, only used for flash messages

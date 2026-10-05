@@ -66,6 +66,30 @@
     a.dl { color: var(--blue); text-decoration: none; font-weight: 500; }
     a.dl:hover { text-decoration: underline; }
     .fname { color: var(--gray); font-size: 12px; font-weight: 400; overflow-wrap: anywhere; }
+    .gen {
+      background: var(--blue-light); border: 1px solid #bfdbfe; border-radius: 8px;
+      padding: 14px 16px; margin-bottom: 18px;
+    }
+    .gen-title { font-weight: 600; font-size: 14px; color: var(--navy); margin-bottom: 10px; }
+    .gen-row { display: flex; gap: 12px; align-items: flex-end; flex-wrap: wrap; }
+    .gen-row .grow { flex: 1 1 200px; }
+    .gen-row label { font-weight: 500; font-size: 12.5px; color: var(--gray); }
+    .gen-row select, .gen-row input {
+      width: 100%; padding: 8px 10px; border: 1px solid var(--border);
+      border-radius: 6px; font-size: 13.5px; background: #fff;
+    }
+    button.gen-btn { margin-top: 0; padding: 9px 16px; font-size: 14px; }
+    button.gen-btn:disabled { background: var(--gray); cursor: wait; }
+    .gen-note { font-weight: 400; font-size: 12.5px; color: var(--gray); margin-left: 6px; }
+    .gen-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 12px; }
+    button.gen-btn.secondary { background: #fff; color: var(--navy); border: 1px solid var(--navy); }
+    button.gen-btn.secondary:hover { background: var(--blue-light); }
+    .chat-panel { margin-top: 10px; font-size: 13px; }
+    .chat-panel ol { margin: 0 0 8px; padding-left: 20px; line-height: 1.6; }
+    .chat-panel textarea { min-height: 140px; font-size: 12px; background: #fff; }
+    .chat-panel button { margin-top: 8px; }
+    .gen-status { font-size: 13px; color: var(--gray); margin-top: 8px; min-height: 1em; }
+    .gen-status.error { color: #b91c1c; }
     .empty { color: var(--gray); font-size: 14px; padding: 8px 0; }
     footer { text-align: center; color: var(--gray); font-size: 12.5px; margin-top: 30px; }
 
@@ -74,6 +98,7 @@
     @media (max-width: 600px) {
       .card { padding: 16px; }
       .settings-grid { grid-template-columns: 1fr; }
+      .gen-row > div, .gen-actions button { flex: 1 1 100%; }
       .settings-grid > div.wide { grid-column: span 1; }
       table, tbody, tr, td { display: block; }
       tr.head { display: none; }
@@ -97,6 +122,48 @@
     {% endwith %}
 
     <form class="card" action="{{ url_for('generate') }}" method="post" target="_blank">
+      <div class="gen">
+        <div class="gen-title">
+          Make today's prompt
+          <span class="gen-note">
+            {% if provider == 'gemini' %}using Gemini (free)
+            {% elif provider == 'claude' %}using Claude
+            {% else %}no API key set &mdash; use &ldquo;Copy for chat&rdquo;{% endif %}
+          </span>
+        </div>
+        <div class="gen-row">
+          <div>
+            <label for="gen_weekday">Day</label>
+            <select id="gen_weekday">
+              {% for d in weekdays %}
+              <option value="{{ d }}">{{ d }} &mdash; {{ weekly_plan[d][0] }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="grow">
+            <label for="gen_theme">Theme (optional)</label>
+            <input type="text" id="gen_theme" maxlength="200" placeholder="e.g. space, Eid, a lost kitten, the rainy season">
+          </div>
+        </div>
+        <div class="gen-actions">
+          {% if provider %}
+          <button type="button" id="gen_btn" class="gen-btn" onclick="generatePrompt()">&#10024; Generate today's prompt</button>
+          {% endif %}
+          <button type="button" id="chat_btn" class="gen-btn {% if provider %}secondary{% endif %}" onclick="copyForChat()">&#128203; Copy for Gemini / Claude chat</button>
+        </div>
+        <div id="gen_status" class="gen-status" role="status"></div>
+        <div id="chat_panel" class="chat-panel" hidden>
+          <ol>
+            <li>Copy this message (it may already be copied).</li>
+            <li>Paste it into <a href="https://gemini.google.com/app" target="_blank" rel="noopener">Gemini</a>
+              or <a href="https://claude.ai/new" target="_blank" rel="noopener">Claude</a>.</li>
+            <li>Copy the reply's code block and paste it into the <b>Day prompt</b> box below.</li>
+          </ol>
+          <textarea id="chat_text" readonly></textarea>
+          <button type="button" class="gen-btn secondary" onclick="copyChatText()">Copy message</button>
+        </div>
+      </div>
+
       <label for="prompt_text">
         Day prompt
         <button type="button" class="example-link" onclick="fillExample()">use example</button>
@@ -178,6 +245,78 @@
     const EXAMPLE = {{ example_prompt|tojson }};
     function fillExample() {
       document.getElementById('prompt_text').value = EXAMPLE;
+    }
+
+    // default the generator's day to today (in the browser's time zone)
+    const WEEKDAYS = {{ weekdays|tojson }};
+    document.getElementById('gen_weekday').value = WEEKDAYS[(new Date().getDay() + 6) % 7];
+
+    function generatorBody() {
+      return JSON.stringify({
+        weekday: document.getElementById('gen_weekday').value,
+        theme: document.getElementById('gen_theme').value,
+        student_name: document.getElementById('student_name').value,
+      });
+    }
+
+    async function copyForChat() {
+      const status = document.getElementById('gen_status');
+      status.className = 'gen-status';
+      try {
+        const res = await fetch({{ url_for('api_chat_prompt')|tojson }}, {
+          method: 'POST', headers: {'Content-Type': 'application/json'}, body: generatorBody(),
+        });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok || !data.chat_text) throw new Error(data.error || 'Something went wrong (' + res.status + ').');
+        document.getElementById('chat_text').value = data.chat_text;
+        document.getElementById('chat_panel').hidden = false;
+        status.textContent = (await copyChatText())
+          ? 'Copied! Paste it into Gemini or Claude.'
+          : 'Select the message below and copy it.';
+      } catch (err) {
+        status.className = 'gen-status error';
+        status.textContent = err.message;
+      }
+    }
+
+    // navigator.clipboard only works on https/localhost, so fall back to
+    // the old select-and-copy for http://<nas-ip> addresses.
+    async function copyChatText() {
+      const ta = document.getElementById('chat_text');
+      try {
+        await navigator.clipboard.writeText(ta.value);
+        return true;
+      } catch (e) {
+        ta.focus();
+        ta.select();
+        try { return document.execCommand('copy'); } catch (e2) { return false; }
+      }
+    }
+
+    async function generatePrompt() {
+      const box = document.getElementById('prompt_text');
+      const btn = document.getElementById('gen_btn');
+      const status = document.getElementById('gen_status');
+      if (box.value.trim() && !confirm('Replace the prompt that is already in the box?')) return;
+      btn.disabled = true;
+      status.className = 'gen-status';
+      status.textContent = 'Claude is writing a prompt… this can take up to a minute.';
+      try {
+        const res = await fetch({{ url_for('api_generate_prompt')|tojson }}, {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: generatorBody(),
+        });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok || !data.prompt_text) throw new Error(data.error || 'Something went wrong (' + res.status + ').');
+        box.value = data.prompt_text;
+        status.textContent = 'Done! Read it over, change anything you like, then press Generate PDF.';
+      } catch (err) {
+        status.className = 'gen-status error';
+        status.textContent = err.message;
+      } finally {
+        btn.disabled = false;
+      }
     }
   </script>
 </body>

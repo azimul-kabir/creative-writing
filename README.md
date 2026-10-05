@@ -67,6 +67,7 @@ Pick *1 page* under Settings (or set `PAGES: "1"` in
 
 ```
 app.py                 Flask web app (the routes)
+prompt_generator.py     "Make today's prompt" — Gemini / Claude / copy-for-chat
 worksheet.py            Core module: PDF drawing engine + prompt parser
                         (also runnable as a CLI — see below)
 templates/index.html    The single-page form + history UI
@@ -77,6 +78,70 @@ examples/day2_prompt.txt  A sample prompt in the expected format
 docs/                   README hero image + screenshots
                         (docs/hero.html is the hero's source)
 ```
+
+## Make today's prompt (Gemini, Claude, or copy-paste)
+
+Don't want to write the day's prompt yourself? The box at the top of the
+form makes one for you:
+
+1. Pick the **day**. It defaults to today, and each day has its own
+   writing focus, so a week works through a mix of Cambridge Stage 3
+   skills:
+
+   | Day | Writing type | Skill practised |
+   |---|---|---|
+   | Monday | Character Description | describing looks and personality, giving reasons with *because* |
+   | Tuesday | Setting & Senses | two describing words before a noun; sight, sound, smell, touch, taste |
+   | Wednesday | Dialogue | speech marks; stronger words than *said* |
+   | Thursday | Adventure Story | time connectives (*first, then, finally*); exclamation marks |
+   | Friday | Problem & Solution Story | three paragraphs joined with *and, but, so, because* |
+   | Saturday | Diary or Letter | first person, past tense, feelings |
+   | Sunday | Imagine If... | questions and exclamations |
+
+2. Optionally type a **theme** (space, Eid, a lost kitten...).
+3. Then either:
+   - **Generate today's prompt** (needs an API key, see below). After
+     10–60 seconds the prompt box fills in by itself.
+   - **Copy for Gemini / Claude chat** (no key needed). This copies a
+     ready-made message. Paste it into the Gemini app or claude.ai, which
+     your Gemini or Claude subscription covers, then paste the reply's
+     code block into the prompt box.
+4. Read it over, edit anything, then press **Generate PDF**.
+
+Either way you get a topic, story starter, chat questions, Word Vault
+words *with meanings*, and a Star Challenge, written for an 8-year-old in
+Dhaka. It mixes everyday Bangladeshi life with fantasy and adventure,
+uses British spelling, and avoids topics from your recent worksheets. The
+request never includes her name or school; the name is only added
+locally. The weekly plan and the instructions live at the top of
+`prompt_generator.py` if you want to change them.
+
+### API keys (optional)
+
+Put a key in a file called `.env` next to `docker-compose.yml` (it's
+git-ignored), then rebuild with `docker compose up -d --build`:
+
+```
+# free: create one at https://aistudio.google.com/apikey
+GEMINI_API_KEY=...
+```
+
+- **Gemini** (`GEMINI_API_KEY`) is **free**. The free tier's daily limit
+  is far more than one prompt a day. On the free tier, Google may use
+  requests to improve its products. The model defaults to
+  `gemini-3.8-flash`; set `GEMINI_MODEL` to change it.
+- **Claude** (`ANTHROPIC_API_KEY`, from
+  [console.anthropic.com](https://console.anthropic.com)) is paid
+  separately from a Claude Pro subscription, at roughly 5–10 US cents a
+  prompt with the default model.
+
+If both keys are set, Gemini is used unless `PROMPT_PROVIDER=claude`.
+When running locally without Docker, `export GEMINI_API_KEY=...` before
+`python3 app.py`.
+
+**Paste-back tip:** the prompt box accepts text pasted from a chat app
+as-is. Code fences, **bold** labels and a "Here's your prompt!" line
+are all ignored.
 
 ## The prompt format
 
