@@ -38,7 +38,13 @@ REQUEST_TIMEOUT = float(os.environ.get("PROMPT_TIMEOUT", "45"))
 
 WEEKDAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
 
-GEMINI_MODEL = os.environ.get("GEMINI_MODEL", "gemini-3.8-flash")
+# Tried in order: when one is overloaded (503) or its free quota is used up
+# (429 - free limits are per model), the next one gets a go.
+GEMINI_MODELS = [
+    m.strip() for m in os.environ.get(
+        "GEMINI_MODEL", "gemini-3.8-flash,gemini-3.7-flash,gemini-3.5-flash"
+    ).split(",") if m.strip()
+]
 CLAUDE_MODEL = os.environ.get("CLAUDE_MODEL", "claude-opus-5-5")
 
 # weekday -> (category shown on the worksheet, the skill to practise)
@@ -206,59 +212,79 @@ def chat_prompt_text(weekday, student_name="Adeeba", theme="", recent_topics=())
     return f"{SYSTEM_PROMPT}\n\n{user}{CHAT_FORMAT.format(example=example)}"
 
 
+# statuses where another model may well succeed: overloaded / server error,
+# per-model quota used up, model retired
+_GEMINI_TRY_NEXT = {404, 429, 500, 503}
+
+
 def _ask_gemini(user):
     from google import genai
     from google.genai import types
 
-    started = time.monotonic()
-    try:
-        # One attempt only: the SDK otherwise retries timeouts up to 3 times,
-        # which can stretch a slow request to minutes.
-        client = genai.Client(
-            api_key=os.environ["GEMINI_API_KEY"],
-            http_options=types.HttpOptions(retry_options=types.HttpRetryOptions(attempts=1)),
-        )
-        interaction = client.interactions.create(
-            model=GEMINI_MODEL,
-            system_instruction=SYSTEM_PROMPT,
-            input=user,
-            response_format={
-                "type": "text",
-                "mime_type": "application/json",
-                "schema": OUTPUT_SCHEMA,
-            },
-            # a short creative task: light thinking keeps replies to seconds
-            generation_config={"thinking_level": "low"},
-            store=False,
-            timeout=REQUEST_TIMEOUT,
-        )
-    except Exception as exc:
-        # The SDK's error classes aren't exported publicly, so sort by the
-        # HTTP status they carry; anything that isn't an API error re-raises.
-        log.warning("Gemini request failed after %.1fs: %s: %s",
-                    time.monotonic() - started, type(exc).__name__, exc)
-        if not type(exc).__module__.startswith("google."):
-            raise
-        if "timeout" in type(exc).__name__.lower():
-            raise PromptGenerationError(
-                f"Gemini didn't answer within {REQUEST_TIMEOUT:.0f} seconds - try again.")
-        status = getattr(exc, "status_code", None)
-        if status in (401, 403) or "API_KEY_INVALID" in str(exc):
-            raise PromptGenerationError(
-                "The Gemini API key was rejected - check GEMINI_API_KEY.")
-        if status == 429:
-            raise PromptGenerationError(
-                "Gemini's free daily limit is used up (or it's busy) - try again later.")
-        if status:
-            raise PromptGenerationError(
-                f"Gemini returned an error ({status}): {_api_message(exc)}")
-        raise PromptGenerationError("Couldn't reach Gemini - check the internet connection.")
+    # One attempt per model: the SDK otherwise retries timeouts up to 3
+    # times, which can stretch a slow request to minutes.
+    client = genai.Client(
+        api_key=os.environ["GEMINI_API_KEY"],
+        http_options=types.HttpOptions(retry_options=types.HttpRetryOptions(attempts=1)),
+    )
+    # REQUEST_TIMEOUT is the budget for all models together, so the page
+    # still gets an answer before a reverse proxy gives up.
+    deadline = time.monotonic() + REQUEST_TIMEOUT
+    last_error = None
 
-    log.info("Gemini replied in %.1fs (status %s)", time.monotonic() - started, interaction.status)
-    if interaction.status != "completed" or not interaction.output_text:
-        raise PromptGenerationError(
-            "Gemini didn't finish the prompt - try again or pick a different theme.")
-    return interaction.output_text
+    for model in GEMINI_MODELS:
+        remaining = deadline - time.monotonic()
+        if remaining < 5:
+            break
+        started = time.monotonic()
+        try:
+            interaction = client.interactions.create(
+                model=model,
+                system_instruction=SYSTEM_PROMPT,
+                input=user,
+                response_format={
+                    "type": "text",
+                    "mime_type": "application/json",
+                    "schema": OUTPUT_SCHEMA,
+                },
+                # a short creative task: light thinking keeps replies to seconds
+                generation_config={"thinking_level": "low"},
+                store=False,
+                # leave time for the next model if this one hangs
+                timeout=min(remaining, 25),
+            )
+        except Exception as exc:
+            # The SDK's error classes aren't exported publicly, so sort by
+            # the HTTP status they carry; anything that isn't an API error
+            # re-raises.
+            log.warning("Gemini %s failed after %.1fs: %s: %s", model,
+                        time.monotonic() - started, type(exc).__name__, exc)
+            if not type(exc).__module__.startswith("google."):
+                raise
+            status = getattr(exc, "status_code", None)
+            if status in (401, 403) or "API_KEY_INVALID" in str(exc):
+                raise PromptGenerationError(
+                    "The Gemini API key was rejected - check GEMINI_API_KEY.")
+            if "timeout" in type(exc).__name__.lower():
+                last_error = f"{model} didn't answer in time"
+                continue
+            if status in _GEMINI_TRY_NEXT:
+                last_error = f"{model}: {_api_message(exc)}"
+                continue
+            if status:
+                raise PromptGenerationError(
+                    f"Gemini returned an error ({status}): {_api_message(exc)}")
+            raise PromptGenerationError("Couldn't reach Gemini - check the internet connection.")
+
+        log.info("Gemini %s replied in %.1fs (status %s)", model,
+                 time.monotonic() - started, interaction.status)
+        if interaction.status == "completed" and interaction.output_text:
+            return interaction.output_text
+        last_error = f"{model} didn't finish the prompt"
+
+    raise PromptGenerationError(
+        "Gemini is busy right now - wait a minute and try again, or use "
+        f"\"Copy for Gemini / Claude chat\". ({last_error or 'no time left'})")
 
 
 def _api_message(exc):

@@ -128,8 +128,11 @@ GEMINI_API_KEY=...
 
 - **Gemini** (`GEMINI_API_KEY`) is **free**. The free tier's daily limit
   is far more than one prompt a day. On the free tier, Google may use
-  requests to improve its products. The model defaults to
-  `gemini-3.8-flash`; set `GEMINI_MODEL` to change it.
+  requests to improve its products. It tries `gemini-3.8-flash` first.
+  If that model is overloaded ("high demand") or its free quota is used
+  up, it moves on to `gemini-3.7-flash`, then `gemini-3.5-flash`, all
+  within 45 seconds. To change the list, set `GEMINI_MODEL` to
+  comma-separated model IDs.
 - **Claude** (`ANTHROPIC_API_KEY`, from
   [console.anthropic.com](https://console.anthropic.com)) is paid
   separately from a Claude Pro subscription, at roughly 5–10 US cents a
