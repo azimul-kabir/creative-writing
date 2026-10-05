@@ -25,7 +25,16 @@ added locally, when the text is formatted.
 """
 
 import json
+import logging
 import os
+import time
+
+log = logging.getLogger(__name__)
+
+# Stay under the 60 s that reverse proxies (e.g. Synology's) allow by
+# default, so a slow reply ends in our own error message instead of a
+# bare "504 Gateway Timeout" from the proxy.
+REQUEST_TIMEOUT = float(os.environ.get("PROMPT_TIMEOUT", "45"))
 
 WEEKDAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
 
@@ -199,9 +208,16 @@ def chat_prompt_text(weekday, student_name="Adeeba", theme="", recent_topics=())
 
 def _ask_gemini(user):
     from google import genai
+    from google.genai import types
 
+    started = time.monotonic()
     try:
-        client = genai.Client(api_key=os.environ["GEMINI_API_KEY"])
+        # One attempt only: the SDK otherwise retries timeouts up to 3 times,
+        # which can stretch a slow request to minutes.
+        client = genai.Client(
+            api_key=os.environ["GEMINI_API_KEY"],
+            http_options=types.HttpOptions(retry_options=types.HttpRetryOptions(attempts=1)),
+        )
         interaction = client.interactions.create(
             model=GEMINI_MODEL,
             system_instruction=SYSTEM_PROMPT,
@@ -211,13 +227,21 @@ def _ask_gemini(user):
                 "mime_type": "application/json",
                 "schema": OUTPUT_SCHEMA,
             },
-            timeout=90.0,
+            # a short creative task: light thinking keeps replies to seconds
+            generation_config={"thinking_level": "low"},
+            store=False,
+            timeout=REQUEST_TIMEOUT,
         )
     except Exception as exc:
         # The SDK's error classes aren't exported publicly, so sort by the
         # HTTP status they carry; anything that isn't an API error re-raises.
+        log.warning("Gemini request failed after %.1fs: %s: %s",
+                    time.monotonic() - started, type(exc).__name__, exc)
         if not type(exc).__module__.startswith("google."):
             raise
+        if "timeout" in type(exc).__name__.lower():
+            raise PromptGenerationError(
+                f"Gemini didn't answer within {REQUEST_TIMEOUT:.0f} seconds - try again.")
         status = getattr(exc, "status_code", None)
         if status in (401, 403) or "API_KEY_INVALID" in str(exc):
             raise PromptGenerationError(
@@ -226,20 +250,34 @@ def _ask_gemini(user):
             raise PromptGenerationError(
                 "Gemini's free daily limit is used up (or it's busy) - try again later.")
         if status:
-            raise PromptGenerationError(f"Gemini returned an error ({status}).")
+            raise PromptGenerationError(
+                f"Gemini returned an error ({status}): {_api_message(exc)}")
         raise PromptGenerationError("Couldn't reach Gemini - check the internet connection.")
 
+    log.info("Gemini replied in %.1fs (status %s)", time.monotonic() - started, interaction.status)
     if interaction.status != "completed" or not interaction.output_text:
         raise PromptGenerationError(
             "Gemini didn't finish the prompt - try again or pick a different theme.")
     return interaction.output_text
 
 
+def _api_message(exc):
+    """The human-readable message inside a Google API error, if there is one."""
+    body = getattr(exc, "body", None)
+    try:
+        data = json.loads(body) if isinstance(body, str) else body
+        if isinstance(data, list):
+            data = data[0]
+        return str(data["error"]["message"])[:300]
+    except (TypeError, ValueError, KeyError, IndexError):
+        return str(exc)[:300]
+
+
 def _ask_claude(user):
     import anthropic
 
     try:
-        client = anthropic.Anthropic(timeout=90.0)
+        client = anthropic.Anthropic(timeout=REQUEST_TIMEOUT, max_retries=0)
         response = client.beta.messages.create(
             model=CLAUDE_MODEL,
             max_tokens=16000,
@@ -259,6 +297,9 @@ def _ask_claude(user):
         raise PromptGenerationError("Claude is busy right now - try again in a minute.")
     except anthropic.APIStatusError as exc:
         raise PromptGenerationError(f"Claude returned an error ({exc.status_code}).")
+    except anthropic.APITimeoutError:
+        raise PromptGenerationError(
+            f"Claude didn't answer within {REQUEST_TIMEOUT:.0f} seconds - try again.")
     except anthropic.APIConnectionError:
         raise PromptGenerationError("Couldn't reach Claude - check the internet connection.")
 

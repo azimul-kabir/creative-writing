@@ -21,6 +21,7 @@ GET  /healthz     plain 200 OK, for Docker/Synology health checks
 """
 
 import json
+import logging
 import os
 import time
 from pathlib import Path
@@ -32,6 +33,9 @@ from flask import (
 
 import prompt_generator
 import worksheet
+
+# send INFO logs (e.g. how long Gemini took) to stdout, i.e. `docker logs`
+logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
 
 app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY", "dev-key-change-me")

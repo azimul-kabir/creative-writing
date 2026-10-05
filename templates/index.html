@@ -259,6 +259,16 @@
       });
     }
 
+    // a status with no JSON body came from something in front of the app
+    // (e.g. a reverse proxy), not from the app itself
+    function errorFor(status) {
+      if (status === 504 || status === 502) {
+        return 'The request timed out before the prompt arrived (' + status + '). '
+          + 'Try again, or use "Copy for Gemini / Claude chat".';
+      }
+      return 'Something went wrong (' + status + ').';
+    }
+
     async function copyForChat() {
       const status = document.getElementById('gen_status');
       status.className = 'gen-status';
@@ -267,7 +277,7 @@
           method: 'POST', headers: {'Content-Type': 'application/json'}, body: generatorBody(),
         });
         const data = await res.json().catch(() => ({}));
-        if (!res.ok || !data.chat_text) throw new Error(data.error || 'Something went wrong (' + res.status + ').');
+        if (!res.ok || !data.chat_text) throw new Error(data.error || errorFor(res.status));
         document.getElementById('chat_text').value = data.chat_text;
         document.getElementById('chat_panel').hidden = false;
         status.textContent = (await copyChatText())
@@ -308,7 +318,7 @@
           body: generatorBody(),
         });
         const data = await res.json().catch(() => ({}));
-        if (!res.ok || !data.prompt_text) throw new Error(data.error || 'Something went wrong (' + res.status + ').');
+        if (!res.ok || !data.prompt_text) throw new Error(data.error || errorFor(res.status));
         box.value = data.prompt_text;
         status.textContent = 'Done! Read it over, change anything you like, then press Generate PDF.';
       } catch (err) {
